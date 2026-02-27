@@ -1,6 +1,7 @@
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json().catch(() => ({}));
+
     const {
       password,
       title,
@@ -12,62 +13,60 @@ export async function onRequestPost({ request, env }) {
       server4_type, server4_url,
     } = body;
 
-    if (password !== env.ADMIN_PASSWORD) return new Response("Unauthorized", { status: 401 });
-    if (!title || typeof title !== "string") return new Response("Title wajib diisi", { status: 400 });
-
-    const normType = (t) => {
-      const x = String(t || "").toLowerCase().trim();
-      if (!x) return null;
-      if (!["mp4","hls","iframe"].includes(x)) return "__invalid__";
-      return x;
-    };
-    const normUrl = (u) => {
-      const x = String(u || "").trim();
-      return x ? x : null;
-    };
-
-    const s = [
-      { t: normType(server1_type), u: normUrl(server1_url) },
-      { t: normType(server2_type), u: normUrl(server2_url) },
-      { t: normType(server3_type), u: normUrl(server3_url) },
-      { t: normType(server4_type), u: normUrl(server4_url) },
-    ];
-
-    // validasi pasangan
-    for (let i=0;i<4;i++){
-      const name = `server${i+1}`;
-      if (s[i].u && s[i].t === "__invalid__") return new Response(`${name}_type invalid`, { status: 400 });
-      if (s[i].u && !s[i].t) return new Response(`${name}_type wajib kalau url diisi`, { status: 400 });
-      if (!s[i].u && s[i].t) return new Response(`${name}_url wajib kalau type diisi`, { status: 400 });
+    if (password !== env.ADMIN_PASSWORD) {
+      return new Response("Unauthorized", { status: 401 });
     }
 
-    // pilih main type/url dari server pertama yang kepake
-    const main = s.find(x => x.t && x.u);
-    if (!main) return new Response("Minimal isi 1 server (type + url)", { status: 400 });
+    if (!title) {
+      return new Response("Title wajib diisi", { status: 400 });
+    }
+
+    const servers = [
+      { type: server1_type, url: server1_url },
+      { type: server2_type, url: server2_url },
+      { type: server3_type, url: server3_url },
+      { type: server4_type, url: server4_url },
+    ].map(s => ({
+      type: s.type?.trim().toLowerCase(),
+      url: s.url?.trim()
+    })).filter(s => s.type && s.url);
+
+    if (!servers.length) {
+      return new Response("Minimal isi 1 server", { status: 400 });
+    }
+
+    // 🔥 ambil server pertama sebagai default
+    const main = servers[0];
 
     await env.DB.prepare(`
       INSERT INTO videos (
-        title, genre, thumbnail_url,
-        type, url,
+        title,
+        type,
+        url,
+        thumbnail_url,
+        genre,
         server1_type, server1_url,
         server2_type, server2_url,
         server3_type, server3_url,
         server4_type, server4_url
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      title.trim(),
-      (genre ? String(genre).trim() : null),
-      (thumbnail_url ? String(thumbnail_url).trim() : null),
+      title,
+      main.type,          // isi kolom lama
+      main.url,           // isi kolom lama
+      thumbnail_url || null,
+      genre || null,
 
-      main.t, main.u,                 -- INI FIX UTAMA (buat kolom lama NOT NULL)
-      s[0].t, s[0].u,
-      s[1].t, s[1].u,
-      s[2].t, s[2].u,
-      s[3].t, s[3].u
+      server1_type || null, server1_url || null,
+      server2_type || null, server2_url || null,
+      server3_type || null, server3_url || null,
+      server4_type || null, server4_url || null
     ).run();
 
     return Response.json({ success: true });
+
   } catch (err) {
-    return new Response("Error: " + (err?.message || String(err)), { status: 500 });
+    return new Response("Error: " + err.message, { status: 500 });
   }
 }
