@@ -1,38 +1,690 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
-  <title>Video List</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>videypro</title>
+
+  <!-- favicon pake logo -->
+  <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
+
   <style>
-    body{background:#111;color:#fff;font-family:sans-serif}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
-    .card{background:#1c1c1c;padding:12px;border-radius:12px}
-    img{width:100%;border-radius:8px}
-    a{color:white;text-decoration:none}
+    :root{
+      --bg:#0a0a0a;
+      --card:#111;
+      --line:#1f1f1f;
+      --muted:#9ca3af;
+      --text:#fff;
+      --acc:#60a5fa;
+      --r:16px;
+      --max:1080px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* Header (kecil) */
+    .header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(10,10,10,.85);
+      backdrop-filter:saturate(140%) blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .bar{
+      max-width:var(--max); margin:0 auto;
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .left{
+      display:flex; align-items:center; gap:10px; min-width:0;
+    }
+    .logo{
+      width:28px; height:28px; border-radius:8px;
+      background:#000; border:1px solid var(--line);
+      overflow:hidden; flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .brand{
+      font-weight:800; letter-spacing:.2px;
+      font-size:16px; line-height:1;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .right{display:flex; align-items:center; gap:8px}
+    .iconbtn{
+      width:38px; height:38px;
+      border-radius:12px;
+      background:#0d0d0d; border:1px solid var(--line);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+    .iconbtn:hover{border-color:#2b2b2b}
+    .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+
+    /* Search dropdown (toggle) */
+    .searchWrap{
+      max-width:var(--max); margin:0 auto;
+      padding:0 12px 10px;
+      display:none;
+    }
+    .searchWrap.on{display:block}
+    .searchBox{
+      display:flex; gap:10px; align-items:center;
+      background:#0d0d0d; border:1px solid var(--line);
+      border-radius:14px; padding:10px 12px;
+    }
+    .searchBox input{
+      flex:1; border:0; outline:0;
+      background:transparent; color:#fff;
+      font-size:14px;
+    }
+    .searchHint{color:var(--muted); font-size:12px}
+
+    /* Drawer */
+    .drawerMask{
+      position:fixed; inset:0; z-index:60;
+      background:rgba(0,0,0,.55);
+      display:none;
+    }
+    .drawerMask.on{display:block}
+    .drawer{
+      position:fixed; top:0; right:-320px; height:100%; width:320px; z-index:61;
+      background:#0d0d0d; border-left:1px solid var(--line);
+      transition:right .2s ease;
+      padding:14px;
+    }
+    .drawer.on{right:0}
+    .drawerTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .drawerTitle{font-weight:800}
+    .closebtn{
+      width:38px;height:38px;border-radius:12px;
+      background:#0b0b0b;border:1px solid var(--line);
+      display:grid;place-items:center;cursor:pointer;
+    }
+    .navList{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+    .navItem{
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0b0b0b;
+      border:1px solid var(--line);
+      cursor:pointer;
+      font-size:14px;
+    }
+    .navItem:hover{border-color:#2b2b2b}
+    .navSection{margin-top:10px; color:var(--muted); font-size:12px}
+
+    /* Layout */
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 12px 0}
+    .sectionTitle{
+      display:flex; align-items:center; justify-content:space-between;
+      margin:10px 0 10px;
+    }
+    .sectionTitle h2{
+      margin:0; font-size:14px; letter-spacing:.2px;
+      color:#e5e7eb; font-weight:800;
+    }
+
+    /* Carousel (popular + wide posters) */
+    .carousel{
+      position:relative;
+      background:transparent;
+    }
+    .track{
+      display:flex; gap:10px;
+      overflow:auto; scroll-snap-type:x mandatory;
+      padding-bottom:6px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .track::-webkit-scrollbar{height:8px}
+    .track::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
+    .citem{
+      flex:0 0 auto;
+      width:260px;
+      scroll-snap-align:start;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .thumb169{aspect-ratio:16/9;background:#000}
+    .thumb196{aspect-ratio:19/6;background:#000}
+    .citem img{width:100%;height:100%;object-fit:cover}
+    .cmeta{padding:10px 10px 12px}
+    .ctitle{
+      font-weight:800; font-size:13px; line-height:1.2;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .csub{margin-top:6px; font-size:12px; color:var(--muted)}
+    .carBtns{
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .carBtn{
+      pointer-events:auto;
+      width:36px;height:36px;border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(13,13,13,.8);
+      display:grid;place-items:center; cursor:pointer;
+      margin:0 6px;
+    }
+    .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
+    .carBtn:hover{border-color:#2b2b2b}
+
+    /* Grid videos 2 kolom */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (min-width:900px){
+      .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
+    }
+    @media (max-width:420px){
+      .grid{grid-template-columns:repeat(1, minmax(0, 1fr))}
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .card .thumb{aspect-ratio:16/9;background:#000}
+    .card .thumb img{width:100%;height:100%;object-fit:cover}
+    .meta{padding:10px 10px 12px}
+    .title{
+      font-weight:800;font-size:13px;line-height:1.2;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    }
+    .sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Pagination */
+    .pager{
+      display:flex; gap:8px; flex-wrap:wrap;
+      justify-content:center;
+      padding:16px 0 6px;
+    }
+    .pbtn{
+      min-width:38px;height:38px;
+      border-radius:12px;
+      background:#0d0d0d;
+      border:1px solid var(--line);
+      display:grid;place-items:center;
+      cursor:pointer;
+      font-size:13px;
+      padding:0 10px;
+    }
+    .pbtn:hover{border-color:#2b2b2b}
+    .pbtn.on{background:#0b1220;border-color:#2b3a57;color:#fff}
+    .pbtn.dot{cursor:default; opacity:.7}
+
+    /* Footer */
+    .footer{
+      border-top:1px solid var(--line);
+      margin-top:14px;
+      padding:14px 12px 18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+
+    /* Utility */
+    .hide{display:none!important}
   </style>
 </head>
+
 <body>
+  <!-- Header -->
+  <header class="header">
+    <div class="bar">
+      <div class="left">
+        <div class="logo">
+          <img alt="logo" loading="lazy"
+               src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
+        </div>
+        <div class="brand">videypro</div>
+      </div>
 
-<h1>Semua Video</h1>
-<div id="list" class="grid"></div>
-<a href="/admin.html">Admin</a>
+      <div class="right">
+        <button class="iconbtn" id="btnSearch" aria-label="search">
+          <!-- search icon -->
+          <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+        </button>
+        <button class="iconbtn" id="btnMenu" aria-label="menu">
+          <!-- hamburger icon -->
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
 
-<script>
-async function load() {
-  const res = await fetch("/api/videos");
-  const videos = await res.json();
+    <!-- Search (toggle) -->
+    <div class="searchWrap" id="searchWrap">
+      <div class="searchBox">
+        <input id="q" placeholder="Cari judul / genre..." autocomplete="off" />
+        <div class="searchHint" id="searchHint"></div>
+      </div>
+    </div>
+  </header>
 
-  const list = document.getElementById("list");
+  <!-- Drawer -->
+  <div class="drawerMask" id="drawerMask"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawerTop">
+      <div class="drawerTitle">Menu</div>
+      <button class="closebtn" id="btnClose" aria-label="close">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
 
-  list.innerHTML = videos.map(v => `
-    <a href="/watch.html?id=${v.id}" class="card">
-      <img src="${v.thumbnail_url || 'https://via.placeholder.com/400x225?text=No+Thumbnail'}">
-      <h3>${v.title}</h3>
-      <small>${v.type.toUpperCase()}</small>
-    </a>
-  `).join("");
-}
-load();
-</script>
+    <div class="navList" id="navStatic">
+      <div class="navItem" data-nav="latest">Latest Update</div>
+      <div class="navItem" data-nav="new">New Update</div>
+      <div class="navItem" data-nav="jadwal">Jadwal Update</div>
+    </div>
 
+    <div class="navSection">Genre</div>
+    <div class="navList" id="navGenres"></div>
+  </aside>
+
+  <!-- Content -->
+  <main class="wrap">
+
+    <!-- Popular -->
+    <section id="popularSection" class="hide">
+      <div class="sectionTitle">
+        <h2>Popular Post</h2>
+      </div>
+      <div class="carousel">
+        <div class="track" id="popularTrack"></div>
+        <div class="carBtns">
+          <button class="carBtn" id="popularPrev" aria-label="prev">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="carBtn" id="popularNext" aria-label="next">
+            <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Wide posters (19:6) inserted later -->
+    <section id="wideSection" class="hide" style="margin-top:14px">
+      <div class="sectionTitle">
+        <h2>Poster</h2>
+      </div>
+      <div class="carousel">
+        <div class="track" id="wideTrack"></div>
+        <div class="carBtns">
+          <button class="carBtn" id="widePrev" aria-label="prev">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="carBtn" id="wideNext" aria-label="next">
+            <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid -->
+    <section style="margin-top:14px">
+      <div class="sectionTitle">
+        <h2 id="listTitle">All Videos</h2>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="pager" id="pager"></div>
+    </section>
+
+    <footer class="footer">videypro</footer>
+  </main>
+
+  <script>
+    // ---------- Utils ----------
+    const $ = (id) => document.getElementById(id);
+    const esc = (s="") => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+
+    // ---------- Config ----------
+    const PAGE_SIZE = 20;         // max 20 per halaman
+    const INSERT_WIDE_EVERY = 6;  // sela 6 video
+    const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
+
+    // ---------- State ----------
+    let all = [];
+    let filtered = [];
+    let currentPage = 1;
+    let currentGenre = ""; // filter dari drawer
+
+    // ---------- API ----------
+    async function loadVideos(){
+      const r = await fetch("/api/videos", { cache: "no-store" });
+      if (!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
+    }
+
+    // ---------- Header controls ----------
+    function toggleSearch(force){
+      const w = $("searchWrap");
+      const on = typeof force === "boolean" ? force : !w.classList.contains("on");
+      w.classList.toggle("on", on);
+      if (on) {
+        $("q").focus();
+      } else {
+        $("q").value = "";
+        $("searchHint").textContent = "";
+        currentGenre = "";
+        applyFilters();
+      }
+    }
+
+    function openDrawer(open){
+      const mask = $("drawerMask");
+      const d = $("drawer");
+      const on = typeof open === "boolean" ? open : !d.classList.contains("on");
+      mask.classList.toggle("on", on);
+      d.classList.toggle("on", on);
+      d.setAttribute("aria-hidden", on ? "false" : "true");
+    }
+
+    // ---------- Carousels ----------
+    function scrollByCard(track, dir=1){
+      const card = track.querySelector(".citem");
+      const w = card ? (card.getBoundingClientRect().width + 10) : 260;
+      track.scrollBy({ left: dir * w * 2, behavior: "smooth" });
+    }
+
+    function renderCarousel(trackEl, items, kind){
+      // kind: "popular" (16:9) or "wide" (19:6)
+      trackEl.innerHTML = items.map(v => {
+        const thumb = (kind === "wide") ? (v.poster_wide_url || v.thumbnail_url || LOGO) : (v.thumbnail_url || LOGO);
+        const ratioClass = (kind === "wide") ? "thumb196" : "thumb169";
+        return `
+          <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="${ratioClass}">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+            </div>
+            <div class="cmeta">
+              <div class="ctitle">${esc(v.title || "Untitled")}</div>
+              <div class="csub">${esc(v.genre || "")}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    // ---------- Grid + Wide insertion ----------
+    function buildGridItems(pageItems, widePosters){
+      // sisip wide poster carousel setiap 6 video (kalo ada)
+      const chunks = [];
+      let wideIndex = 0;
+
+      for (let i=0; i<pageItems.length; i++){
+        chunks.push({ type:"video", v: pageItems[i] });
+
+        const at = i + 1;
+        const shouldInsert = (at % INSERT_WIDE_EVERY === 0);
+        if (shouldInsert && widePosters.length){
+          // sisip 1 wide carousel “slice” (misal 6 poster per strip)
+          const slice = widePosters.slice(wideIndex, wideIndex + 8);
+          if (slice.length){
+            chunks.push({ type:"wideStrip", posters: slice });
+            wideIndex += slice.length;
+            if (wideIndex >= widePosters.length) wideIndex = 0; // loop biar gak habis
+          }
+        }
+      }
+      return chunks;
+    }
+
+    function renderWideStrip(posters, idx){
+      const id = `wstrip_${idx}`;
+      const prevId = `wprev_${idx}`;
+      const nextId = `wnext_${idx}`;
+      return `
+        <div class="card" style="grid-column:1/-1;padding:10px">
+          <div class="carousel">
+            <div class="track" id="${id}">
+              ${posters.map(v => `
+                <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}" style="width:420px">
+                  <div class="thumb196">
+                    <img loading="lazy" src="${esc(v.poster_wide_url || v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
+                  </div>
+                  <div class="cmeta">
+                    <div class="ctitle">${esc(v.title || "Untitled")}</div>
+                    <div class="csub">${esc(v.genre || "")}</div>
+                  </div>
+                </a>
+              `).join("")}
+            </div>
+            <div class="carBtns">
+              <button class="carBtn" id="${prevId}" aria-label="prev">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button class="carBtn" id="${nextId}" aria-label="next">
+                <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderGrid(chunks){
+      const grid = $("grid");
+      let wideStripCount = 0;
+
+      grid.innerHTML = chunks.map(item => {
+        if (item.type === "wideStrip"){
+          const html = renderWideStrip(item.posters, wideStripCount);
+          wideStripCount++;
+          return html;
+        }
+        const v = item.v;
+        const thumb = v.thumbnail_url || LOGO;
+        return `
+          <a class="card" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="thumb">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+            </div>
+            <div class="meta">
+              <div class="title">${esc(v.title || "Untitled")}</div>
+              <div class="sub">
+                ${v.genre ? `<span>${esc(v.genre)}</span>` : ``}
+              </div>
+            </div>
+          </a>
+        `;
+      }).join("");
+
+      // bind strip carousel buttons
+      for (let i=0;i<wideStripCount;i++){
+        const t = $(`wstrip_${i}`);
+        const p = $(`wprev_${i}`);
+        const n = $(`wnext_${i}`);
+        if (t && p && n){
+          p.onclick = () => scrollByCard(t, -1);
+          n.onclick = () => scrollByCard(t, 1);
+        }
+      }
+    }
+
+    // ---------- Pagination ----------
+    function setPage(p){
+      currentPage = p;
+      renderList();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function paginate(totalPages){
+      const pager = $("pager");
+      pager.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      const maxButtons = 7; // enteng, gak kepanjangan
+      const btn = (label, p, cls="") => {
+        const b = document.createElement("button");
+        b.className = `pbtn ${cls}`.trim();
+        b.textContent = label;
+        if (p) b.onclick = () => setPage(p);
+        return b;
+      };
+
+      const page = currentPage;
+      const pages = [];
+
+      // build window
+      pages.push(1);
+      const start = Math.max(2, page - 2);
+      const end = Math.min(totalPages - 1, page + 2);
+
+      if (start > 2) pages.push("...");
+      for (let i=start;i<=end;i++) pages.push(i);
+      if (end < totalPages - 1) pages.push("...");
+      if (totalPages > 1) pages.push(totalPages);
+
+      // if too many, compress (simple)
+      const compact = [];
+      for (const x of pages){
+        if (compact.length && compact[compact.length-1] === x) continue;
+        compact.push(x);
+      }
+
+      compact.forEach(x => {
+        if (x === "...") pager.appendChild(btn("…", null, "dot"));
+        else pager.appendChild(btn(String(x), x, (x===page ? "on" : "")));
+      });
+    }
+
+    // ---------- Filters (search + genre) ----------
+    function applyFilters(){
+      const q = $("q").value.trim().toLowerCase();
+      const byGenre = currentGenre.trim().toLowerCase();
+
+      filtered = all.filter(v => {
+        const title = String(v.title || "").toLowerCase();
+        const genre = String(v.genre || "").toLowerCase();
+
+        const matchQ = !q || title.includes(q) || genre.includes(q);
+        const matchG = !byGenre || genre.split(",").map(x=>x.trim()).includes(byGenre);
+        return matchQ && matchG;
+      });
+
+      currentPage = 1;
+      renderList();
+
+      // search hint (kecil)
+      $("searchHint").textContent = q ? `${filtered.length} hasil` : "";
+      $("listTitle").textContent = byGenre ? `Genre: ${currentGenre}` : "All Videos";
+    }
+
+    // ---------- Render list (popular + wide + grid + pager) ----------
+    function renderList(){
+      // Popular: item dengan is_popular truthy
+      const popular = filtered.filter(v => v.is_popular);
+      if (popular.length){
+        $("popularSection").classList.remove("hide");
+        renderCarousel($("popularTrack"), popular.slice(0, 20), "popular");
+      } else {
+        $("popularSection").classList.add("hide");
+      }
+
+      // Wide posters: item yang punya poster_wide_url
+      const wide = filtered.filter(v => v.poster_wide_url);
+      if (wide.length){
+        // section wide (khusus atas) — optional, tapi lu minta ada popular di atas.
+        // Kita tampilkan hanya kalau ada wide, biar keren. (Tetap enteng)
+        $("wideSection").classList.remove("hide");
+        renderCarousel($("wideTrack"), wide.slice(0, 20), "wide");
+      } else {
+        $("wideSection").classList.add("hide");
+      }
+
+      // Pagination angka (20 per page)
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      const page = Math.min(currentPage, totalPages);
+      currentPage = page;
+
+      const start = (page - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+      // Sisip wide strip tiap 6 video (kalau ada wide)
+      const chunks = buildGridItems(pageItems, wide);
+      renderGrid(chunks);
+
+      // kalau lagi search, tetap paginated (enteng). bisa diubah kalau mau.
+      paginate(totalPages);
+    }
+
+    // ---------- Drawer genre list ----------
+    function renderGenres(){
+      const set = new Set();
+      all.forEach(v => {
+        const g = String(v.genre || "").split(",").map(x=>x.trim()).filter(Boolean);
+        g.forEach(x => set.add(x));
+      });
+      const genres = Array.from(set).sort((a,b)=>a.localeCompare(b));
+
+      const wrap = $("navGenres");
+      wrap.innerHTML = genres.map(g => `<div class="navItem" data-genre="${esc(g)}">${esc(g)}</div>`).join("");
+
+      wrap.querySelectorAll("[data-genre]").forEach(el => {
+        el.addEventListener("click", () => {
+          currentGenre = el.getAttribute("data-genre") || "";
+          openDrawer(false);
+          applyFilters();
+        });
+      });
+
+      // static nav actions (placeholder)
+      $("navStatic").querySelectorAll("[data-nav]").forEach(el=>{
+        el.addEventListener("click", ()=>{
+          // ini cuma placeholder, lu bisa nanti arahkan ke halaman khusus
+          openDrawer(false);
+          // contoh: set filter genre kosong & scroll ke top
+          currentGenre = "";
+          applyFilters();
+        });
+      });
+    }
+
+    // ---------- Init ----------
+    async function init(){
+      // buttons
+      $("btnSearch").addEventListener("click", ()=>toggleSearch());
+      $("btnMenu").addEventListener("click", ()=>openDrawer(true));
+      $("btnClose").addEventListener("click", ()=>openDrawer(false));
+      $("drawerMask").addEventListener("click", ()=>openDrawer(false));
+
+      // carousel buttons
+      $("popularPrev").onclick = ()=>scrollByCard($("popularTrack"), -1);
+      $("popularNext").onclick = ()=>scrollByCard($("popularTrack"), 1);
+      $("widePrev").onclick = ()=>scrollByCard($("wideTrack"), -1);
+      $("wideNext").onclick = ()=>scrollByCard($("wideTrack"), 1);
+
+      // realtime search
+      $("q").addEventListener("input", debounce(applyFilters, 120));
+
+      // load
+      try{
+        all = await loadVideos();
+        filtered = all.slice();
+        renderGenres();
+        renderList();
+      }catch(e){
+        $("grid").innerHTML = `<div class="card" style="padding:14px">Error: ${esc(e.message || e)}</div>`;
+        $("pager").innerHTML = "";
+      }
+    }
+
+    init();
+  </script>
 </body>
-</html>
+  </html>
