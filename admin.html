@@ -1,46 +1,320 @@
 <!doctype html>
-<html>
-<head><title>Admin</title></head>
-<body style="background:#111;color:#fff;font-family:sans-serif">
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel</title>
+  <style>
+    body{margin:0;background:#0b0b0b;color:#fff;font-family:system-ui,Segoe UI,Roboto}
+    .wrap{max-width:1000px;margin:24px auto;padding:0 16px}
+    .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    a{color:#7dd3fc;text-decoration:none}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+    .card{background:#121212;border:1px solid #222;border-radius:16px;padding:14px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:780px){.row{grid-template-columns:1fr}}
+    label{display:block;font-size:13px;color:#9ca3af;margin-bottom:6px}
+    input,select,button,textarea{
+      width:100%;box-sizing:border-box;
+      padding:10px 12px;border-radius:12px;border:1px solid #333;
+      background:#0f0f0f;color:#fff;
+    }
+    textarea{min-height:80px;resize:vertical}
+    button{cursor:pointer;border:1px solid #374151;background:#111827}
+    button:hover{background:#0b1220}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .muted{color:#9ca3af;font-size:13px}
+    .serverHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .pill{font-size:12px;color:#cbd5e1;background:#0f172a;border:1px solid #1f2a44;padding:6px 10px;border-radius:999px}
+    .preview{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .thumb{width:160px;aspect-ratio:16/9;border-radius:12px;background:#000;border:1px solid #222;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .ok{color:#86efac}
+    .bad{color:#fca5a5}
+    .status{white-space:pre-wrap}
+    .small{font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <a href="/">&larr; balik</a>
+        <h1 style="margin:8px 0 0">Admin Panel</h1>
+        <div class="muted">Tambah video + 1–4 server nonton (mp4/hls/iframe) + genre + thumbnail_url.</div>
+      </div>
+      <div class="pill">Public index ✅</div>
+    </div>
 
-<h1>Tambah Video</h1>
+    <div class="grid">
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>Password admin</label>
+            <input id="password" type="password" placeholder="ADMIN_PASSWORD" autocomplete="current-password" />
+          </div>
+          <div>
+            <label>Genre</label>
+            <input id="genre" placeholder="contoh: action, drama" />
+            <div class="muted small">Boleh satu, boleh comma-separated.</div>
+          </div>
+        </div>
 
-<input id="password" type="password" placeholder="password"><br><br>
-<input id="title" placeholder="judul"><br><br>
+        <div style="height:10px"></div>
 
-<select id="type">
-  <option value="mp4">MP4</option>
-  <option value="hls">HLS</option>
-  <option value="iframe">Iframe</option>
-</select><br><br>
+        <div class="row">
+          <div>
+            <label>Judul</label>
+            <input id="title" placeholder="judul video" />
+          </div>
+          <div>
+            <label>Thumbnail URL (optional)</label>
+            <input id="thumbnail_url" placeholder="https://.../thumb.jpg" />
+          </div>
+        </div>
 
-<input id="url" placeholder="video url"><br><br>
-<input id="thumb" placeholder="thumbnail url (optional)"><br><br>
+        <div style="height:12px"></div>
 
-<button onclick="add()">Post</button>
+        <div class="preview">
+          <div class="thumb" id="thumbBox">
+            <img id="thumbImg" alt="thumbnail" style="display:none">
+          </div>
+          <div style="flex:1;min-width:240px">
+            <div class="btns">
+              <button type="button" id="btnPreviewThumb">Preview thumbnail</button>
+              <button type="button" id="btnClearAll">Clear</button>
+              <button type="button" id="btnAutofillTypes">Auto-detect types</button>
+            </div>
+            <div class="muted small" style="margin-top:8px">
+              Tips auto-detect: URL ending <b>.mp4</b> → mp4, ending <b>.m3u8</b> → hls, selain itu → iframe.
+            </div>
+          </div>
+        </div>
+      </div>
 
-<div id="status"></div>
+      <!-- Servers -->
+      <div class="card" id="serversCard">
+        <div class="serverHead">
+          <h2 style="margin:0">Server Nonton (maks 4)</h2>
+          <span class="pill">Minimal isi 1 server</span>
+        </div>
+        <div class="muted small" style="margin-top:6px">
+          Type: mp4 / hls (.m3u8) / iframe (paste URL <b>src</b> iframe).
+        </div>
 
-<script>
-async function add() {
-  const data = {
-    password: document.getElementById("password").value,
-    title: document.getElementById("title").value,
-    type: document.getElementById("type").value,
-    url: document.getElementById("url").value,
-    thumbnail_url: document.getElementById("thumb").value
-  };
+        <div style="height:12px"></div>
 
-  const res = await fetch("/api/admin/add", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify(data)
-  });
+        <div id="servers"></div>
+      </div>
 
-  document.getElementById("status").innerText =
-    res.ok ? "Sukses!" : "Gagal!";
-}
-</script>
+      <div class="card">
+        <div class="btns">
+          <button type="button" id="btnSubmit">🚀 Publish</button>
+          <button type="button" id="btnSubmitAndReset">Publish + Reset</button>
+        </div>
+        <div id="status" class="muted status" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const SERVER_COUNT = 4;
+
+    function detectType(url) {
+      const u = (url || "").trim().toLowerCase();
+      if (!u) return "";
+      if (u.endsWith(".m3u8")) return "hls";
+      if (u.endsWith(".mp4")) return "mp4";
+      return "iframe";
+    }
+
+    function renderServers() {
+      const wrap = $("servers");
+      wrap.innerHTML = "";
+      for (let i = 1; i <= SERVER_COUNT; i++) {
+        const block = document.createElement("div");
+        block.className = "card";
+        block.style.marginBottom = "12px";
+        block.innerHTML = `
+          <div class="serverHead">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div class="pill">Server ${i}</div>
+              <div class="muted small" id="hint${i}"></div>
+            </div>
+            <button type="button" data-clear="${i}" style="width:auto">Clear</button>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="row">
+            <div>
+              <label>Type</label>
+              <select id="server${i}_type">
+                <option value="">(kosong)</option>
+                <option value="mp4">mp4</option>
+                <option value="hls">hls</option>
+                <option value="iframe">iframe</option>
+              </select>
+            </div>
+            <div>
+              <label>URL</label>
+              <input id="server${i}_url" placeholder="https://.../.mp4 atau .m3u8 atau iframe src" />
+            </div>
+          </div>
+
+          <div style="height:8px"></div>
+          <div class="btns">
+            <button type="button" data-detect="${i}" style="width:auto">Auto type</button>
+            <button type="button" data-open="${i}" style="width:auto">Open URL</button>
+          </div>
+        `;
+        wrap.appendChild(block);
+
+        // live hint
+        const urlEl = block.querySelector(`#server${i}_url`);
+        const hintEl = block.querySelector(`#hint${i}`);
+        urlEl.addEventListener("input", () => {
+          const t = detectType(urlEl.value);
+          hintEl.textContent = urlEl.value.trim() ? `detected: ${t}` : "";
+        });
+
+        // actions
+        block.querySelector(`[data-detect="${i}"]`).addEventListener("click", () => {
+          const t = detectType(urlEl.value);
+          block.querySelector(`#server${i}_type`).value = t || "";
+        });
+
+        block.querySelector(`[data-open="${i}"]`).addEventListener("click", () => {
+          const u = urlEl.value.trim();
+          if (!u) return alert("URL kosong");
+          window.open(u, "_blank", "noopener,noreferrer");
+        });
+
+        block.querySelector(`[data-clear="${i}"]`).addEventListener("click", () => {
+          block.querySelector(`#server${i}_type`).value = "";
+          urlEl.value = "";
+          hintEl.textContent = "";
+        });
+      }
+    }
+
+    function setStatus(msg, ok = true) {
+      const el = $("status");
+      el.className = "muted status " + (ok ? "ok" : "bad");
+      el.textContent = msg;
+    }
+
+    function previewThumb() {
+      const url = $("thumbnail_url").value.trim();
+      const img = $("thumbImg");
+      if (!url) {
+        img.style.display = "none";
+        $("thumbBox").style.background = "#000";
+        setStatus("Thumbnail kosong (optional).", true);
+        return;
+      }
+      img.src = url;
+      img.onload = () => {
+        img.style.display = "block";
+        setStatus("Thumbnail loaded ✅", true);
+      };
+      img.onerror = () => {
+        img.style.display = "none";
+        setStatus("Thumbnail gagal load (cek URL / hotlink).", false);
+      };
+    }
+
+    function clearAll() {
+      $("title").value = "";
+      $("genre").value = "";
+      $("thumbnail_url").value = "";
+      previewThumb();
+      for (let i = 1; i <= SERVER_COUNT; i++) {
+        $(`server${i}_type`).value = "";
+        $(`server${i}_url`).value = "";
+        $(`hint${i}`).textContent = "";
+      }
+      setStatus("Cleared.", true);
+    }
+
+    function autofillTypes() {
+      for (let i = 1; i <= SERVER_COUNT; i++) {
+        const url = $(`server${i}_url`).value.trim();
+        if (!url) continue;
+        $(`server${i}_type`).value = detectType(url);
+      }
+      setStatus("Auto-detect selesai ✅", true);
+    }
+
+    function buildPayload() {
+      const payload = {
+        password: $("password").value,
+        title: $("title").value.trim(),
+        genre: $("genre").value.trim(),
+        thumbnail_url: $("thumbnail_url").value.trim(),
+      };
+
+      for (let i = 1; i <= SERVER_COUNT; i++) {
+        payload[`server${i}_type`] = $(`server${i}_type`).value.trim();
+        payload[`server${i}_url`] = $(`server${i}_url`).value.trim();
+      }
+      // normalize empty -> null by backend anyway, but keep clean
+      if (!payload.genre) delete payload.genre;
+      if (!payload.thumbnail_url) delete payload.thumbnail_url;
+
+      return payload;
+    }
+
+    async function submit(resetAfter) {
+      setStatus("Publishing...", true);
+      const payload = buildPayload();
+
+      if (!payload.title) return setStatus("Judul wajib diisi.", false);
+
+      // minimal 1 server valid
+      let hasServer = false;
+      for (let i = 1; i <= SERVER_COUNT; i++) {
+        const t = payload[`server${i}_type`];
+        const u = payload[`server${i}_url`];
+        if ((t && !u) || (!t && u)) {
+          return setStatus(`Server ${i}: type dan url harus berpasangan.`, false);
+        }
+        if (t && u) hasServer = true;
+      }
+      if (!hasServer) return setStatus("Minimal isi 1 server (type + url).", false);
+
+      const r = await fetch("/api/admin/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!r.ok) {
+        const txt = await r.text();
+        return setStatus("Gagal: " + txt, false);
+      }
+
+      setStatus("Sukses ✅ Video kepublish. Cek homepage (/).", true);
+      if (resetAfter) clearAll();
+    }
+
+    // init
+    renderServers();
+
+    $("btnPreviewThumb").addEventListener("click", previewThumb);
+    $("btnClearAll").addEventListener("click", clearAll);
+    $("btnAutofillTypes").addEventListener("click", autofillTypes);
+    $("btnSubmit").addEventListener("click", () => submit(false));
+    $("btnSubmitAndReset").addEventListener("click", () => submit(true));
+
+    // live preview thumb
+    $("thumbnail_url").addEventListener("input", () => {
+      // debounce ringan
+      clearTimeout(window.__t);
+      window.__t = setTimeout(previewThumb, 500);
+    });
+  </script>
 </body>
 </html>
