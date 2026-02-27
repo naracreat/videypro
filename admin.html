@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head><title>Admin</title></head>
+<body style="background:#111;color:#fff;font-family:sans-serif">
+
+<h1>Tambah Video</h1>
+
+<input id="password" type="password" placeholder="password"><br><br>
+<input id="title" placeholder="judul"><br><br>
+
+<select id="type">
+  <option value="mp4">MP4</option>
+  <option value="hls">HLS</option>
+  <option value="iframe">Iframe</option>
+</select><br><br>
+
+<input id="url" placeholder="video url"><br><br>
+<input id="thumb" placeholder="thumbnail url (optional)"><br><br>
+
+<button onclick="add()">Post</button>
+
+<div id="status"></div>
+
+<script>
+async function add() {
+  const data = {
+    password: document.getElementById("password").value,
+    title: document.getElementById("title").value,
+    type: document.getElementById("type").value,
+    url: document.getElementById("url").value,
+    thumbnail_url: document.getElementById("thumb").value
+  };
+
+  const res = await fetch("/api/admin/add", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("status").innerText =
+    res.ok ? "Sukses!" : "Gagal!";
+}
+</script>
+
+</body>
+</html>
