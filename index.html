@@ -1,91 +1,38 @@
 <!doctype html>
-<html lang="id">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Live Nonton</title>
-    <style>
-      body { margin:0; background:#0b0b0b; color:#fff; font-family:system-ui, -apple-system, Segoe UI, Roboto; }
-      .wrap { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
-      .card { background:#121212; border:1px solid #222; border-radius:16px; padding:16px; }
-      .player { aspect-ratio: 16 / 9; width: 100%; border-radius: 14px; overflow:hidden; background:#000; }
-      iframe { width:100%; height:100%; border:0; }
-      .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:12px; }
-      .badge { padding:6px 10px; border-radius:999px; background:#1b1b1b; border:1px solid #2a2a2a; font-size:14px; }
-      a { color:#7dd3fc; text-decoration:none; }
-      a:hover { text-decoration:underline; }
-      .hint { color:#bdbdbd; font-size:14px; margin-top:10px; }
-      button { background:#1f2937; color:#fff; border:1px solid #374151; padding:10px 12px; border-radius:12px; cursor:pointer; }
-      button:hover { background:#111827; }
-    </style>
-  </head>
+<html>
+<head>
+  <title>Video List</title>
+  <style>
+    body{background:#111;color:#fff;font-family:sans-serif}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:#1c1c1c;padding:12px;border-radius:12px}
+    img{width:100%;border-radius:8px}
+    a{color:white;text-decoration:none}
+  </style>
+</head>
+<body>
 
-  <body>
-    <div class="wrap">
-      <h1>Live Nonton</h1>
+<h1>Semua Video</h1>
+<div id="list" class="grid"></div>
+<a href="/admin.html">Admin</a>
 
-      <div class="card">
-        <div class="player" id="playerBox">
-          <!-- Nanti kita tempel iframe Cloudflare Stream di sini -->
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;">
-            Belum ada stream ID. Edit <code>config</code> di bawah.
-          </div>
-        </div>
+<script>
+async function load() {
+  const res = await fetch("/api/videos");
+  const videos = await res.json();
 
-        <div class="row">
-          <span class="badge">Mode: publik</span>
-          <span class="badge" id="status">Status: belum diset</span>
-          <button id="btnReload" type="button">Reload player</button>
-        </div>
+  const list = document.getElementById("list");
 
-        <div class="hint">
-          Cara pakai: isi <b>customerCode</b> dan <b>videoId</b> di config.
-          Kalau belum punya, bikin dulu di Cloudflare Stream (bagian “Live Inputs”).
-        </div>
-      </div>
+  list.innerHTML = videos.map(v => `
+    <a href="/watch.html?id=${v.id}" class="card">
+      <img src="${v.thumbnail_url || 'https://via.placeholder.com/400x225?text=No+Thumbnail'}">
+      <h3>${v.title}</h3>
+      <small>${v.type.toUpperCase()}</small>
+    </a>
+  `).join("");
+}
+load();
+</script>
 
-      <p style="margin-top:16px;color:#9ca3af;">
-        Dibuat dengan GitHub + Cloudflare Pages.
-      </p>
-    </div>
-
-    <script>
-      // === CONFIG ===
-      const config = {
-        customerCode: "", // contoh: "abc123def456..."
-        videoId: "",      // contoh: "1a2b3c4d5e..."
-      };
-
-      const playerBox = document.getElementById("playerBox");
-      const statusEl = document.getElementById("status");
-      const btnReload = document.getElementById("btnReload");
-
-      function renderPlayer() {
-        const { customerCode, videoId } = config;
-
-        if (!customerCode || !videoId) {
-          statusEl.textContent = "Status: config kosong";
-          playerBox.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;text-align:center;padding:16px;">
-              Isi <b>customerCode</b> & <b>videoId</b> di file <code>index.html</code><br/>
-              Setelah itu deploy ulang (push ke GitHub).
-            </div>`;
-          return;
-        }
-
-        statusEl.textContent = "Status: siap embed";
-        const src = `https://customer-${customerCode}.cloudflarestream.com/${videoId}/iframe`;
-
-        playerBox.innerHTML = `
-          <iframe
-            src="${src}"
-            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-            allowfullscreen
-          ></iframe>`;
-      }
-
-      btnReload.addEventListener("click", renderPlayer);
-      renderPlayer();
-    </script>
-  </body>
+</body>
 </html>
