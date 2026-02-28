@@ -130,7 +130,7 @@
       color:#e5e7eb; font-weight:800;
     }
 
-    /* Carousel (popular + wide posters) */
+    /* Carousel (popular + poster tiktok) */
     .carousel{
       position:relative;
       background:transparent;
@@ -153,14 +153,16 @@
       overflow:hidden;
     }
 
-    /* FIX: pastikan 19:6 bener-bener 19:6 */
+    /* FIX: poster "tiktok" biar proporsional (lebih sempit) */
+    .citem.tiktok{ width:190px; }
+
     .thumb169{aspect-ratio:16/9;background:#000;height:auto}
-    .thumb196{aspect-ratio:19/6;background:#000;height:auto}
+    /* FIX: thumb196 kita pakai sebagai poster tiktok 9:16 */
+    .thumb196{aspect-ratio:9/16;background:#000;height:auto}
     .thumb196 img{width:100%;height:100%;object-fit:cover}
 
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
-    /* title truncate (16:9 & 19:6) */
     .ctitle{
       font-weight:800; font-size:13px; line-height:1.2;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -201,7 +203,6 @@
     .card .thumb{aspect-ratio:16/9;background:#000}
     .card .thumb img{width:100%;height:100%;object-fit:cover}
     .meta{padding:10px 10px 12px}
-    /* title truncate (16:9) */
     .title{
       font-weight:800;font-size:13px;line-height:1.2;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -275,11 +276,9 @@
 
       <div class="right">
         <button class="iconbtn" id="btnSearch" aria-label="search">
-          <!-- search icon -->
           <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
         </button>
         <button class="iconbtn" id="btnMenu" aria-label="menu">
-          <!-- hamburger icon -->
           <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       </div>
@@ -337,7 +336,7 @@
       </div>
     </section>
 
-    <!-- Wide posters (19:6) -->
+    <!-- Poster (tiktok 9:16) -->
     <section id="wideSection" class="hide" style="margin-top:14px">
       <div class="sectionTitle">
         <h2>Poster</h2>
@@ -429,13 +428,14 @@
     }
 
     function renderCarousel(trackEl, items, kind){
-      // kind: "popular" (16:9) or "wide" (19:6)
+      // kind: "popular" (16:9) or "wide" (poster tiktok 9:16)
       trackEl.innerHTML = items.map(v => {
-        const thumb = (kind === "wide") ? (v.poster_wide_url || v.thumbnail_url || LOGO) : (v.thumbnail_url || LOGO);
-        const ratioClass = (kind === "wide") ? "thumb196" : "thumb169";
+        const isTikTok = (kind === "wide");
+        const thumb = isTikTok ? (v.poster_wide_url || v.thumbnail_url || LOGO) : (v.thumbnail_url || LOGO);
+        const ratioClass = isTikTok ? "thumb196" : "thumb169";
         const viewsText = fmtViews(v.views);
         return `
-          <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+          <a class="citem ${isTikTok ? "tiktok" : ""}" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
             <div class="${ratioClass}">
               <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
               <div class="badgeHD">HD</div>
@@ -450,23 +450,22 @@
       }).join("");
     }
 
-    // ---------- Grid + Wide insertion ----------
-    function buildGridItems(pageItems, widePosters){
-      // sisip wide poster carousel setiap 6 video (kalo ada)
+    // ---------- Grid + Poster insertion ----------
+    function buildGridItems(pageItems, posters){
       const chunks = [];
-      let wideIndex = 0;
+      let pIndex = 0;
 
       for (let i=0; i<pageItems.length; i++){
         chunks.push({ type:"video", v: pageItems[i] });
 
         const at = i + 1;
         const shouldInsert = (at % INSERT_WIDE_EVERY === 0);
-        if (shouldInsert && widePosters.length){
-          const slice = widePosters.slice(wideIndex, wideIndex + 8);
+        if (shouldInsert && posters.length){
+          const slice = posters.slice(pIndex, pIndex + 10);
           if (slice.length){
             chunks.push({ type:"wideStrip", posters: slice });
-            wideIndex += slice.length;
-            if (wideIndex >= widePosters.length) wideIndex = 0;
+            pIndex += slice.length;
+            if (pIndex >= posters.length) pIndex = 0;
           }
         }
       }
@@ -484,7 +483,7 @@
               ${posters.map(v => {
                 const viewsText = fmtViews(v.views);
                 return `
-                <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}" style="width:420px">
+                <a class="citem tiktok" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
                   <div class="thumb196">
                     <img loading="lazy" src="${esc(v.poster_wide_url || v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
                     <div class="badgeHD">HD</div>
@@ -513,12 +512,12 @@
 
     function renderGrid(chunks){
       const grid = $("grid");
-      let wideStripCount = 0;
+      let stripCount = 0;
 
       grid.innerHTML = chunks.map(item => {
         if (item.type === "wideStrip"){
-          const html = renderWideStrip(item.posters, wideStripCount);
-          wideStripCount++;
+          const html = renderWideStrip(item.posters, stripCount);
+          stripCount++;
           return html;
         }
         const v = item.v;
@@ -541,8 +540,7 @@
         `;
       }).join("");
 
-      // bind strip carousel buttons
-      for (let i=0;i<wideStripCount;i++){
+      for (let i=0;i<stripCount;i++){
         const t = $(`wstrip_${i}`);
         const p = $(`wprev_${i}`);
         const n = $(`wnext_${i}`);
@@ -618,13 +616,13 @@
       $("listTitle").textContent = byGenre ? `Genre: ${currentGenre}` : "All Videos";
     }
 
-    // ---------- Render list (popular + wide + grid + pager) ----------
+    // ---------- Render list ----------
     function renderList(){
-      // pisahin: wide (19:6) TIDAK masuk All Videos
-      const wide = filtered.filter(v => v.poster_wide_url);
-      const normal = filtered.filter(v => !v.poster_wide_url); // <= ini yang masuk grid
+      // poster (tiktok) TIDAK masuk All Videos
+      const posters = filtered.filter(v => v.poster_wide_url);
+      const normal  = filtered.filter(v => !v.poster_wide_url);
 
-      // Popular: TOP views dari normal (16:9)
+      // Popular: TOP views dari normal
       const popular = [...normal]
         .sort((a,b) => (Number(b.views||0) - Number(a.views||0)))
         .slice(0, 20);
@@ -636,15 +634,13 @@
         $("popularSection").classList.add("hide");
       }
 
-      // Poster (19:6)
-      if (wide.length){
+      if (posters.length){
         $("wideSection").classList.remove("hide");
-        renderCarousel($("wideTrack"), wide.slice(0, 20), "wide");
+        renderCarousel($("wideTrack"), posters.slice(0, 20), "wide");
       } else {
         $("wideSection").classList.add("hide");
       }
 
-      // Pagination dihitung dari normal (karena All Videos cuma normal)
       const totalPages = Math.max(1, Math.ceil(normal.length / PAGE_SIZE));
       const page = Math.min(currentPage, totalPages);
       currentPage = page;
@@ -652,8 +648,7 @@
       const start = (page - 1) * PAGE_SIZE;
       const pageItems = normal.slice(start, start + PAGE_SIZE);
 
-      // Sisip wide strip tiap 6 video (pakai wide yang ada)
-      const chunks = buildGridItems(pageItems, wide);
+      const chunks = buildGridItems(pageItems, posters);
       renderGrid(chunks);
 
       paginate(totalPages);
@@ -716,4 +711,4 @@
     init();
   </script>
 </body>
-</html>
+        </html>
