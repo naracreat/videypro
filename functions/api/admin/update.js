@@ -1,56 +1,94 @@
+// functions/api/admin/update.js
 export async function onRequestPut({ request, env }) {
-  const body = await request.json().catch(() => ({}));
-  const {
-    password, id,
-    title, genre, thumbnail_url,
-    server1_type, server1_url,
-    server2_type, server2_url,
-    server3_type, server3_url,
-    server4_type, server4_url,
-  } = body;
+  try {
+    const body = await request.json().catch(() => ({}));
 
-  if (password !== env.ADMIN_PASSWORD) return new Response("Unauthorized", { status: 401 });
-  if (!id) return new Response("Missing id", { status: 400 });
-  if (!title) return new Response("Title wajib", { status: 400 });
+    // auth
+    if (!env.ADMIN_PASSWORD) return new Response("Server not configured", { status: 500 });
+    if ((body.password || "") !== env.ADMIN_PASSWORD) return new Response("Unauthorized", { status: 401 });
 
-  // pilih main type/url dari server pertama yang valid (buat kolom type/url NOT NULL)
-  const pickMain = () => {
-    const pairs = [
-      { t: (server1_type||"").trim().toLowerCase(), u: (server1_url||"").trim() },
-      { t: (server2_type||"").trim().toLowerCase(), u: (server2_url||"").trim() },
-      { t: (server3_type||"").trim().toLowerCase(), u: (server3_url||"").trim() },
-      { t: (server4_type||"").trim().toLowerCase(), u: (server4_url||"").trim() },
-    ].filter(x => x.t && x.u);
+    const id = Number(body.id);
+    if (!id) return new Response("Missing id", { status: 400 });
 
-    return pairs[0] || null;
-  };
+    const title = clean(body.title);
+    const genre = clean(body.genre);
+    const thumbnail_url = clean(body.thumbnail_url);
+    const poster_wide_url = clean(body.poster_wide_url);
 
-  const main = pickMain();
-  if (!main) return new Response("Minimal isi 1 server (type+url)", { status: 400 });
+    if (!title) return new Response("Title kosong", { status: 400 });
 
-  await env.DB.prepare(`
-    UPDATE videos SET
-      title=?,
-      genre=?,
-      thumbnail_url=?,
-      type=?,
-      url=?,
-      server1_type=?, server1_url=?,
-      server2_type=?, server2_url=?,
-      server3_type=?, server3_url=?,
-      server4_type=?, server4_url=?
-    WHERE id=?
-  `).bind(
-    title.trim(),
-    genre ? String(genre).trim() : null,
-    thumbnail_url ? String(thumbnail_url).trim() : null,
-    main.t, main.u,
-    server1_type || null, server1_url || null,
-    server2_type || null, server2_url || null,
-    server3_type || null, server3_url || null,
-    server4_type || null, server4_url || null,
-    id
-  ).run();
+    const servers = readServers(body);
+    const pairErr = validateServerPairs(servers);
+    if (pairErr) return new Response(pairErr, { status: 400 });
 
-  return Response.json({ success: true });
+    const primary = pickPrimaryServer(servers);
+    if (!primary) return new Response("Minimal isi 1 server", { status: 400 });
+
+    // legacy NOT NULL
+    const type = primary.type;
+    const url = primary.url;
+
+    await env.DB.prepare(
+      `
+      UPDATE videos SET
+        title=?,
+        genre=?,
+        thumbnail_url=?,
+        poster_wide_url=?,
+        type=?,
+        url=?,
+        server1_type=?, server1_url=?,
+        server2_type=?, server2_url=?,
+        server3_type=?, server3_url=?,
+        server4_type=?, server4_url=?
+      WHERE id=?
+      `
+    )
+      .bind(
+        title,
+        genre || null,
+        thumbnail_url || null,
+        poster_wide_url || null,
+        type,
+        url,
+        servers[0].type || null, servers[0].url || null,
+        servers[1].type || null, servers[1].url || null,
+        servers[2].type || null, servers[2].url || null,
+        servers[3].type || null, servers[3].url || null,
+        id
+      )
+      .run();
+
+    return Response.json({ success: true });
+  } catch (err) {
+    return new Response("Error: " + (err?.message || err), { status: 500 });
+  }
+}
+
+function clean(v) {
+  const s = (v ?? "").toString().trim();
+  return s ? s : "";
+}
+
+function readServers(body) {
+  return [1,2,3,4].map(i => ({
+    type: clean(body[`server${i}_type`]),
+    url: clean(body[`server${i}_url`]),
+  }));
+}
+
+function validateServerPairs(servers) {
+  for (let i = 0; i < servers.length; i++) {
+    const t = servers[i].type;
+    const u = servers[i].url;
+    if ((t && !u) || (!t && u)) return `Server ${i+1} type/url harus berpasangan`;
+  }
+  return "";
+}
+
+function pickPrimaryServer(servers) {
+  for (const s of servers) {
+    if (s.type && s.url) return s;
+  }
+  return null;
 }
