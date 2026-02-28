@@ -152,8 +152,12 @@
       border-radius:var(--r);
       overflow:hidden;
     }
-    .thumb169{aspect-ratio:16/9;background:#000}
-    .thumb196{aspect-ratio:19/6;background:#000}
+
+    /* FIX: pastikan 19:6 bener-bener 19:6 */
+    .thumb169{aspect-ratio:16/9;background:#000;height:auto}
+    .thumb196{aspect-ratio:19/6;background:#000;height:auto}
+    .thumb196 img{width:100%;height:100%;object-fit:cover}
+
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
     /* title truncate (16:9 & 19:6) */
@@ -205,7 +209,7 @@
     .sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
 
     /* Badges */
-    .thumb, .thumb169, .thumb196{position:relative}
+    .thumb, .thumb169, .thumb196{position:relative; overflow:hidden}
     .badgeHD{
       position:absolute; top:8px; left:8px;
       padding:4px 8px; border-radius:999px;
@@ -333,7 +337,7 @@
       </div>
     </section>
 
-    <!-- Wide posters (19:6) inserted later -->
+    <!-- Wide posters (19:6) -->
     <section id="wideSection" class="hide" style="margin-top:14px">
       <div class="sectionTitle">
         <h2>Poster</h2>
@@ -370,7 +374,7 @@
     const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
 
     // ---------- Config ----------
-    const PAGE_SIZE = 20;         // max 20 per halaman
+    const PAGE_SIZE = 20;         // max 20 per halaman (grid 16:9)
     const INSERT_WIDE_EVERY = 6;  // sela 6 video
     const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
 
@@ -616,8 +620,12 @@
 
     // ---------- Render list (popular + wide + grid + pager) ----------
     function renderList(){
-      // Popular: TOP views (bukan is_popular)
-      const popular = [...filtered]
+      // pisahin: wide (19:6) TIDAK masuk All Videos
+      const wide = filtered.filter(v => v.poster_wide_url);
+      const normal = filtered.filter(v => !v.poster_wide_url); // <= ini yang masuk grid
+
+      // Popular: TOP views dari normal (16:9)
+      const popular = [...normal]
         .sort((a,b) => (Number(b.views||0) - Number(a.views||0)))
         .slice(0, 20);
 
@@ -625,11 +633,10 @@
         $("popularSection").classList.remove("hide");
         renderCarousel($("popularTrack"), popular, "popular");
       } else {
-        // kalau views semua 0, mending hide biar gak “palsu”
         $("popularSection").classList.add("hide");
       }
 
-      const wide = filtered.filter(v => v.poster_wide_url);
+      // Poster (19:6)
       if (wide.length){
         $("wideSection").classList.remove("hide");
         renderCarousel($("wideTrack"), wide.slice(0, 20), "wide");
@@ -637,13 +644,15 @@
         $("wideSection").classList.add("hide");
       }
 
-      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      // Pagination dihitung dari normal (karena All Videos cuma normal)
+      const totalPages = Math.max(1, Math.ceil(normal.length / PAGE_SIZE));
       const page = Math.min(currentPage, totalPages);
       currentPage = page;
 
       const start = (page - 1) * PAGE_SIZE;
-      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+      const pageItems = normal.slice(start, start + PAGE_SIZE);
 
+      // Sisip wide strip tiap 6 video (pakai wide yang ada)
       const chunks = buildGridItems(pageItems, wide);
       renderGrid(chunks);
 
