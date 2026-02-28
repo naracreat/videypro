@@ -156,9 +156,10 @@
     .thumb196{aspect-ratio:19/6;background:#000}
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
+    /* title truncate (16:9 & 19:6) */
     .ctitle{
       font-weight:800; font-size:13px; line-height:1.2;
-      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .csub{margin-top:6px; font-size:12px; color:var(--muted)}
     .carBtns{
@@ -176,7 +177,7 @@
     .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
     .carBtn:hover{border-color:#2b2b2b}
 
-    /* Grid videos 2 kolom */
+    /* Grid videos 2 kolom (JANGAN jadi 1 kolom) */
     .grid{
       display:grid;
       grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -186,9 +187,7 @@
     @media (min-width:900px){
       .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
     }
-    @media (max-width:420px){
-      .grid{grid-template-columns:repeat(1, minmax(0, 1fr))}
-    }
+
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -198,11 +197,30 @@
     .card .thumb{aspect-ratio:16/9;background:#000}
     .card .thumb img{width:100%;height:100%;object-fit:cover}
     .meta{padding:10px 10px 12px}
+    /* title truncate (16:9) */
     .title{
       font-weight:800;font-size:13px;line-height:1.2;
-      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Badges */
+    .thumb, .thumb169, .thumb196{position:relative}
+    .badgeHD{
+      position:absolute; top:8px; left:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:800;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .badgeViews{
+      position:absolute; bottom:8px; right:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:700;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+      color:#e5e7eb;
+    }
 
     /* Pagination */
     .pager{
@@ -401,15 +419,23 @@
       track.scrollBy({ left: dir * w * 2, behavior: "smooth" });
     }
 
+    function fmtViews(n){
+      const x = Number(n || 0);
+      try { return x.toLocaleString("id-ID"); } catch { return String(x); }
+    }
+
     function renderCarousel(trackEl, items, kind){
       // kind: "popular" (16:9) or "wide" (19:6)
       trackEl.innerHTML = items.map(v => {
         const thumb = (kind === "wide") ? (v.poster_wide_url || v.thumbnail_url || LOGO) : (v.thumbnail_url || LOGO);
         const ratioClass = (kind === "wide") ? "thumb196" : "thumb169";
+        const viewsText = fmtViews(v.views);
         return `
           <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
             <div class="${ratioClass}">
               <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
             </div>
             <div class="cmeta">
               <div class="ctitle">${esc(v.title || "Untitled")}</div>
@@ -432,12 +458,11 @@
         const at = i + 1;
         const shouldInsert = (at % INSERT_WIDE_EVERY === 0);
         if (shouldInsert && widePosters.length){
-          // sisip 1 wide carousel “slice” (misal 6 poster per strip)
           const slice = widePosters.slice(wideIndex, wideIndex + 8);
           if (slice.length){
             chunks.push({ type:"wideStrip", posters: slice });
             wideIndex += slice.length;
-            if (wideIndex >= widePosters.length) wideIndex = 0; // loop biar gak habis
+            if (wideIndex >= widePosters.length) wideIndex = 0;
           }
         }
       }
@@ -452,17 +477,22 @@
         <div class="card" style="grid-column:1/-1;padding:10px">
           <div class="carousel">
             <div class="track" id="${id}">
-              ${posters.map(v => `
+              ${posters.map(v => {
+                const viewsText = fmtViews(v.views);
+                return `
                 <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}" style="width:420px">
                   <div class="thumb196">
                     <img loading="lazy" src="${esc(v.poster_wide_url || v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
+                    <div class="badgeHD">HD</div>
+                    <div class="badgeViews">${viewsText} views</div>
                   </div>
                   <div class="cmeta">
                     <div class="ctitle">${esc(v.title || "Untitled")}</div>
                     <div class="csub">${esc(v.genre || "")}</div>
                   </div>
                 </a>
-              `).join("")}
+                `;
+              }).join("")}
             </div>
             <div class="carBtns">
               <button class="carBtn" id="${prevId}" aria-label="prev">
@@ -489,10 +519,13 @@
         }
         const v = item.v;
         const thumb = v.thumbnail_url || LOGO;
+        const viewsText = fmtViews(v.views);
         return `
           <a class="card" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
             <div class="thumb">
               <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
             </div>
             <div class="meta">
               <div class="title">${esc(v.title || "Untitled")}</div>
@@ -528,7 +561,6 @@
       pager.innerHTML = "";
       if (totalPages <= 1) return;
 
-      const maxButtons = 7; // enteng, gak kepanjangan
       const btn = (label, p, cls="") => {
         const b = document.createElement("button");
         b.className = `pbtn ${cls}`.trim();
@@ -540,7 +572,6 @@
       const page = currentPage;
       const pages = [];
 
-      // build window
       pages.push(1);
       const start = Math.max(2, page - 2);
       const end = Math.min(totalPages - 1, page + 2);
@@ -550,7 +581,6 @@
       if (end < totalPages - 1) pages.push("...");
       if (totalPages > 1) pages.push(totalPages);
 
-      // if too many, compress (simple)
       const compact = [];
       for (const x of pages){
         if (compact.length && compact[compact.length-1] === x) continue;
@@ -580,34 +610,33 @@
       currentPage = 1;
       renderList();
 
-      // search hint (kecil)
       $("searchHint").textContent = q ? `${filtered.length} hasil` : "";
       $("listTitle").textContent = byGenre ? `Genre: ${currentGenre}` : "All Videos";
     }
 
     // ---------- Render list (popular + wide + grid + pager) ----------
     function renderList(){
-      // Popular: item dengan is_popular truthy
-      const popular = filtered.filter(v => v.is_popular);
-      if (popular.length){
+      // Popular: TOP views (bukan is_popular)
+      const popular = [...filtered]
+        .sort((a,b) => (Number(b.views||0) - Number(a.views||0)))
+        .slice(0, 20);
+
+      if (popular.length && Number(popular[0]?.views || 0) > 0){
         $("popularSection").classList.remove("hide");
-        renderCarousel($("popularTrack"), popular.slice(0, 20), "popular");
+        renderCarousel($("popularTrack"), popular, "popular");
       } else {
+        // kalau views semua 0, mending hide biar gak “palsu”
         $("popularSection").classList.add("hide");
       }
 
-      // Wide posters: item yang punya poster_wide_url
       const wide = filtered.filter(v => v.poster_wide_url);
       if (wide.length){
-        // section wide (khusus atas) — optional, tapi lu minta ada popular di atas.
-        // Kita tampilkan hanya kalau ada wide, biar keren. (Tetap enteng)
         $("wideSection").classList.remove("hide");
         renderCarousel($("wideTrack"), wide.slice(0, 20), "wide");
       } else {
         $("wideSection").classList.add("hide");
       }
 
-      // Pagination angka (20 per page)
       const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
       const page = Math.min(currentPage, totalPages);
       currentPage = page;
@@ -615,11 +644,9 @@
       const start = (page - 1) * PAGE_SIZE;
       const pageItems = filtered.slice(start, start + PAGE_SIZE);
 
-      // Sisip wide strip tiap 6 video (kalau ada wide)
       const chunks = buildGridItems(pageItems, wide);
       renderGrid(chunks);
 
-      // kalau lagi search, tetap paginated (enteng). bisa diubah kalau mau.
       paginate(totalPages);
     }
 
@@ -643,12 +670,9 @@
         });
       });
 
-      // static nav actions (placeholder)
       $("navStatic").querySelectorAll("[data-nav]").forEach(el=>{
         el.addEventListener("click", ()=>{
-          // ini cuma placeholder, lu bisa nanti arahkan ke halaman khusus
           openDrawer(false);
-          // contoh: set filter genre kosong & scroll ke top
           currentGenre = "";
           applyFilters();
         });
@@ -657,22 +681,18 @@
 
     // ---------- Init ----------
     async function init(){
-      // buttons
       $("btnSearch").addEventListener("click", ()=>toggleSearch());
       $("btnMenu").addEventListener("click", ()=>openDrawer(true));
       $("btnClose").addEventListener("click", ()=>openDrawer(false));
       $("drawerMask").addEventListener("click", ()=>openDrawer(false));
 
-      // carousel buttons
       $("popularPrev").onclick = ()=>scrollByCard($("popularTrack"), -1);
       $("popularNext").onclick = ()=>scrollByCard($("popularTrack"), 1);
       $("widePrev").onclick = ()=>scrollByCard($("wideTrack"), -1);
       $("wideNext").onclick = ()=>scrollByCard($("wideTrack"), 1);
 
-      // realtime search
       $("q").addEventListener("input", debounce(applyFilters, 120));
 
-      // load
       try{
         all = await loadVideos();
         filtered = all.slice();
@@ -687,4 +707,4 @@
     init();
   </script>
 </body>
-  </html>
+</html>
