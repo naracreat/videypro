@@ -2,7 +2,7 @@ export async function onRequestGet({ env }) {
   try {
     const { results } = await env.DB.prepare(`
       SELECT
-        id, title, genre, thumbnail_url, created_at,
+        id, title, genre, thumbnail_url, poster_wide_url, created_at,
         views,
         type, url,
         server1_type, server1_url,
