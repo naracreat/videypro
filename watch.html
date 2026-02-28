@@ -1,50 +1,758 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
-  <title>Watch</title>
-</head>
-<body style="background:#000;color:#fff;font-family:sans-serif">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>videypro</title>
 
-<a href="/">← balik</a>
-<h1 id="title"></h1>
-<div id="player"></div>
+  <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script>
-async function load() {
-  const id = new URLSearchParams(location.search).get("id");
-  const res = await fetch("/api/videos");
-  const videos = await res.json();
-  const v = videos.find(x => x.id == id);
-  if (!v) return;
-
-  document.getElementById("title").innerText = v.title;
-  const box = document.getElementById("player");
-
-  if (v.type === "iframe") {
-    box.innerHTML = `<iframe src="${v.url}" width="100%" height="500" allowfullscreen></iframe>`;
-    return;
-  }
-
-  box.innerHTML = `<video id="video" controls width="100%"></video>`;
-  const video = document.getElementById("video");
-
-  if (v.type === "mp4") {
-    video.src = v.url;
-  }
-
-  if (v.type === "hls") {
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = v.url;
-    } else {
-      const hls = new Hls();
-      hls.loadSource(v.url);
-      hls.attachMedia(video);
+  <style>
+    :root{
+      --bg:#0a0a0a;
+      --card:#111;
+      --line:#1f1f1f;
+      --muted:#9ca3af;
+      --text:#fff;
+      --acc:#60a5fa;
+      --r:16px;
+      --max:1080px;
     }
-  }
-}
-load();
-</script>
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
 
+    /* Header (sama kayak index) */
+    .header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(10,10,10,.85);
+      backdrop-filter:saturate(140%) blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .bar{
+      max-width:var(--max); margin:0 auto;
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .left{
+      display:flex; align-items:center; gap:10px; min-width:0;
+    }
+    .logo{
+      width:28px; height:28px; border-radius:8px;
+      background:#000; border:1px solid var(--line);
+      overflow:hidden; flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .brand{
+      font-weight:800; letter-spacing:.2px;
+      font-size:16px; line-height:1;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    .right{display:flex; align-items:center; gap:8px}
+    .iconbtn{
+      width:38px; height:38px;
+      border-radius:12px;
+      background:#0d0d0d; border:1px solid var(--line);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+    .iconbtn:hover{border-color:#2b2b2b}
+    .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+
+    /* Search dropdown (toggle) */
+    .searchWrap{
+      max-width:var(--max); margin:0 auto;
+      padding:0 12px 10px;
+      display:none;
+    }
+    .searchWrap.on{display:block}
+    .searchBox{
+      display:flex; gap:10px; align-items:center;
+      background:#0d0d0d; border:1px solid var(--line);
+      border-radius:14px; padding:10px 12px;
+    }
+    .searchBox input{
+      flex:1; border:0; outline:0;
+      background:transparent; color:#fff;
+      font-size:14px;
+    }
+    .searchHint{color:var(--muted); font-size:12px}
+
+    /* Drawer */
+    .drawerMask{
+      position:fixed; inset:0; z-index:60;
+      background:rgba(0,0,0,.55);
+      display:none;
+    }
+    .drawerMask.on{display:block}
+    .drawer{
+      position:fixed; top:0; right:-320px; height:100%; width:320px; z-index:61;
+      background:#0d0d0d; border-left:1px solid var(--line);
+      transition:right .2s ease;
+      padding:14px;
+    }
+    .drawer.on{right:0}
+    .drawerTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .drawerTitle{font-weight:800}
+    .closebtn{
+      width:38px;height:38px;border-radius:12px;
+      background:#0b0b0b;border:1px solid var(--line);
+      display:grid;place-items:center;cursor:pointer;
+    }
+    .navList{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+    .navItem{
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0b0b0b;
+      border:1px solid var(--line);
+      cursor:pointer;
+      font-size:14px;
+    }
+    .navItem:hover{border-color:#2b2b2b}
+    .navSection{margin-top:10px; color:var(--muted); font-size:12px}
+
+    /* Layout */
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 12px 0}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .sectionTitle{
+      display:flex; align-items:center; justify-content:space-between;
+      margin:12px 0 10px;
+    }
+    .sectionTitle h2{
+      margin:0; font-size:14px; letter-spacing:.2px;
+      color:#e5e7eb; font-weight:800;
+    }
+
+    /* Player */
+    .playerCard{padding:10px}
+    .playerWrap{
+      width:100%;
+      background:#000;
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    video{width:100%; height:auto; display:block; background:#000}
+    iframe{width:100%; height:100%; border:0; display:block; background:#000}
+    .iframeBox{aspect-ratio:16/9; width:100%; background:#000}
+
+    .title{
+      margin:10px 2px 0;
+      font-size:16px;
+      font-weight:900;
+      line-height:1.25;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+
+    /* Server buttons */
+    .serverRow{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .sbtn{
+      border:1px solid var(--line);
+      background:#0d0d0d;
+      color:#fff;
+      border-radius:12px;
+      padding:9px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:800;
+      opacity:.95;
+    }
+    .sbtn:hover{border-color:#2b2b2b}
+    .sbtn.on{background:#0b1220;border-color:#2b3a57}
+
+    /* Action buttons */
+    .actionRow{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .abtn{
+      border:1px solid var(--line);
+      background:#0d0d0d;
+      color:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:800;
+      display:flex; align-items:center; gap:8px;
+    }
+    .abtn:hover{border-color:#2b2b2b}
+    .abtn svg{width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
+
+    /* Recommended */
+    .carousel{position:relative}
+    .track{
+      display:flex; gap:10px;
+      overflow:auto; scroll-snap-type:x mandatory;
+      padding-bottom:6px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .track::-webkit-scrollbar{height:8px}
+    .track::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
+    .citem{
+      flex:0 0 auto;
+      width:420px;
+      scroll-snap-align:start;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .thumb196{aspect-ratio:19/6;background:#000;position:relative}
+    .citem img{width:100%;height:100%;object-fit:cover}
+    .cmeta{padding:10px 10px 12px}
+    .ctitle{
+      font-weight:900; font-size:13px; line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .csub{margin-top:6px; font-size:12px; color:var(--muted)}
+    .carBtns{
+      position:absolute; inset:0; pointer-events:none;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .carBtn{
+      pointer-events:auto;
+      width:36px;height:36px;border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(13,13,13,.8);
+      display:grid;place-items:center; cursor:pointer;
+      margin:0 6px;
+    }
+    .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
+    .carBtn:hover{border-color:#2b2b2b}
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (min-width:900px){
+      .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
+    }
+    .gcard{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .thumb169{aspect-ratio:16/9;background:#000;position:relative}
+    .gcard img{width:100%;height:100%;object-fit:cover}
+    .gmeta{padding:10px 10px 12px}
+    .gtitle{
+      font-weight:900;font-size:13px;line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .gsub{margin-top:6px;font-size:12px;color:var(--muted)}
+
+    /* Badges */
+    .badgeHD{
+      position:absolute; top:8px; left:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:900;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .badgeViews{
+      position:absolute; bottom:8px; right:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:800;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+      color:#e5e7eb;
+    }
+
+    /* Footer */
+    .footer{
+      border-top:1px solid var(--line);
+      margin-top:14px;
+      padding:14px 12px 18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+
+    .hide{display:none!important}
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="bar">
+      <a class="left" href="/" aria-label="home">
+        <div class="logo">
+          <img alt="logo" loading="lazy"
+               src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
+        </div>
+        <div class="brand">videypro</div>
+      </a>
+
+      <div class="right">
+        <button class="iconbtn" id="btnSearch" aria-label="search">
+          <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+        </button>
+        <button class="iconbtn" id="btnMenu" aria-label="menu">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="searchWrap" id="searchWrap">
+      <div class="searchBox">
+        <input id="q" placeholder="Cari di rekomendasi..." autocomplete="off" />
+        <div class="searchHint" id="searchHint"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Drawer -->
+  <div class="drawerMask" id="drawerMask"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawerTop">
+      <div class="drawerTitle">Menu</div>
+      <button class="closebtn" id="btnClose" aria-label="close">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="navList" id="navStatic">
+      <a class="navItem" href="/">Home</a>
+      <a class="navItem" href="/">Latest Update</a>
+      <a class="navItem" href="/">New Update</a>
+      <a class="navItem" href="/">Jadwal Update</a>
+    </div>
+
+    <div class="navSection">Genre</div>
+    <div class="navList" id="navGenres"></div>
+  </aside>
+
+  <main class="wrap">
+    <!-- Player -->
+    <section class="card playerCard">
+      <div class="playerWrap" id="playerWrap">
+        <!-- injected -->
+      </div>
+
+      <div class="title" id="videoTitle">Loading...</div>
+
+      <div class="serverRow" id="serverRow"></div>
+
+      <div class="actionRow" id="actionRow">
+        <button class="abtn" id="btnCopy" type="button" aria-label="copy">
+          <svg viewBox="0 0 24 24"><path d="M9 9h10v10H9z"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+          Copy
+        </button>
+        <button class="abtn" id="btnShare" type="button" aria-label="share">
+          <svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
+          Share
+        </button>
+        <a class="abtn hide" id="btnDownload" aria-label="download">
+          <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Unduh
+        </a>
+      </div>
+    </section>
+
+    <!-- Recommended -->
+    <section style="margin-top:14px">
+      <div class="sectionTitle">
+        <h2>Direkomendasikan</h2>
+      </div>
+
+      <section id="wideRecoSection" class="hide">
+        <div class="carousel">
+          <div class="track" id="wideRecoTrack"></div>
+          <div class="carBtns">
+            <button class="carBtn" id="wideRecoPrev" aria-label="prev">
+              <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="carBtn" id="wideRecoNext" aria-label="next">
+              <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+      </section>
+
+      <div class="grid" id="recoGrid"></div>
+    </section>
+
+    <footer class="footer">videypro</footer>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
+    const esc = (s="") => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+
+    function fmtViews(n){
+      const x = Number(n || 0);
+      try { return x.toLocaleString("id-ID"); } catch { return String(x); }
+    }
+
+    function getId(){
+      const u = new URL(location.href);
+      return Number(u.searchParams.get("id") || 0);
+    }
+
+    async function loadVideos(){
+      const r = await fetch("/api/videos", { cache: "no-store" });
+      if (!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
+    }
+
+    async function incViewsAfter10s(id){
+      if (!id) return;
+      setTimeout(() => {
+        fetch("/api/views", {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({ id })
+        }).catch(()=>{});
+      }, 10000);
+    }
+
+    // Header controls
+    function toggleSearch(force){
+      const w = $("searchWrap");
+      const on = typeof force === "boolean" ? force : !w.classList.contains("on");
+      w.classList.toggle("on", on);
+      if (on) $("q").focus();
+      else {
+        $("q").value = "";
+        $("searchHint").textContent = "";
+        applyRecoSearch();
+      }
+    }
+    function openDrawer(open){
+      const mask = $("drawerMask");
+      const d = $("drawer");
+      const on = typeof open === "boolean" ? open : !d.classList.contains("on");
+      mask.classList.toggle("on", on);
+      d.classList.toggle("on", on);
+      d.setAttribute("aria-hidden", on ? "false" : "true");
+    }
+
+    // Drawer genres (same style)
+    function renderGenres(all){
+      const set = new Set();
+      all.forEach(v => {
+        const g = String(v.genre || "").split(",").map(x=>x.trim()).filter(Boolean);
+        g.forEach(x => set.add(x));
+      });
+      const genres = Array.from(set).sort((a,b)=>a.localeCompare(b));
+      const wrap = $("navGenres");
+      wrap.innerHTML = genres.map(g => `<a class="navItem" href="/">${esc(g)}</a>`).join("");
+    }
+
+    // Build server list from video row
+    function buildServers(v){
+      const servers = [];
+      for (let i=1;i<=4;i++){
+        const t = (v[`server${i}_type`] || "").toString().trim();
+        const u = (v[`server${i}_url`] || "").toString().trim();
+        if (t && u) servers.push({ label: `Server ${i}`, type: t, url: u });
+      }
+      // fallback legacy
+      if (!servers.length && v.type && v.url) {
+        servers.push({ label: "Server 1", type: String(v.type), url: String(v.url) });
+      }
+      return servers;
+    }
+
+    // Player rendering
+    let currentServer = null;
+    let currentVideoEl = null;
+    let currentHls = null;
+
+    function destroyPlayer(){
+      try { if (currentHls) { currentHls.destroy(); currentHls = null; } } catch {}
+      currentVideoEl = null;
+      $("playerWrap").innerHTML = "";
+    }
+
+    async function ensureHlsJs(){
+      if (window.Hls) return window.Hls;
+      await new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = "https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js";
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      return window.Hls;
+    }
+
+    async function renderPlayer(server, title){
+      destroyPlayer();
+      currentServer = server;
+
+      // Update action buttons
+      const dl = $("btnDownload");
+      const isMp4 = (server.type || "").toLowerCase() === "mp4" || (server.url || "").toLowerCase().endsWith(".mp4");
+      if (isMp4) {
+        dl.classList.remove("hide");
+        dl.href = server.url;
+        dl.download = "";
+        dl.target = "_blank";
+        dl.rel = "noopener";
+      } else {
+        dl.classList.add("hide");
+        dl.removeAttribute("href");
+      }
+
+      const t = (server.type || "").toLowerCase();
+      const u = server.url;
+
+      if (t === "iframe") {
+        $("playerWrap").innerHTML = `
+          <div class="iframeBox">
+            <iframe src="${esc(u)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        `;
+        return;
+      }
+
+      // mp4/hls pakai <video>
+      $("playerWrap").innerHTML = `<video id="v" controls playsinline preload="metadata"></video>`;
+      const video = $("v");
+      currentVideoEl = video;
+
+      if (t === "mp4") {
+        video.src = u;
+        return;
+      }
+
+      // HLS
+      // coba native dulu (Safari/iOS)
+      if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = u;
+        return;
+      }
+
+      // lazy-load hls.js untuk chrome/firefox
+      const Hls = await ensureHlsJs();
+      if (Hls && Hls.isSupported()) {
+        currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
+        currentHls.loadSource(u);
+        currentHls.attachMedia(video);
+      } else {
+        // fallback: buka link di tab baru
+        $("playerWrap").innerHTML = `
+          <div class="card" style="padding:14px;border-radius:14px">
+            <a href="${esc(u)}" target="_blank" rel="noopener">Open Stream</a>
+          </div>
+        `;
+      }
+    }
+
+    function renderServerButtons(servers, onPick){
+      const row = $("serverRow");
+      row.innerHTML = servers.map((s, idx) => `
+        <button class="sbtn ${idx===0 ? "on":""}" type="button" data-i="${idx}">${esc(s.label)}</button>
+      `).join("");
+
+      row.querySelectorAll("[data-i]").forEach(btn => {
+        btn.onclick = () => {
+          const i = Number(btn.getAttribute("data-i"));
+          row.querySelectorAll(".sbtn").forEach(b=>b.classList.remove("on"));
+          btn.classList.add("on");
+          onPick(servers[i]);
+        };
+      });
+    }
+
+    // Recommended
+    let RECO_ALL = [];
+    let RECO_FILTERED = [];
+
+    function scrollByCard(track, dir=1){
+      const card = track.querySelector(".citem");
+      const w = card ? (card.getBoundingClientRect().width + 10) : 420;
+      track.scrollBy({ left: dir * w * 2, behavior: "smooth" });
+    }
+
+    function renderWideReco(items){
+      const sec = $("wideRecoSection");
+      const track = $("wideRecoTrack");
+      if (!items.length) {
+        sec.classList.add("hide");
+        track.innerHTML = "";
+        return;
+      }
+      sec.classList.remove("hide");
+      track.innerHTML = items.map(v => {
+        const thumb = v.poster_wide_url || v.thumbnail_url || LOGO;
+        const viewsText = fmtViews(v.views);
+        return `
+          <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="thumb196">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
+            </div>
+            <div class="cmeta">
+              <div class="ctitle">${esc(v.title || "Untitled")}</div>
+              <div class="csub">${esc(v.genre || "")}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function renderRecoGrid(items){
+      const grid = $("recoGrid");
+      grid.innerHTML = items.map(v => {
+        const thumb = v.thumbnail_url || LOGO;
+        const viewsText = fmtViews(v.views);
+        return `
+          <a class="gcard" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="thumb169">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
+            </div>
+            <div class="gmeta">
+              <div class="gtitle">${esc(v.title || "Untitled")}</div>
+              <div class="gsub">${esc(v.genre || "")}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function applyRecoSearch(){
+      const q = $("q").value.trim().toLowerCase();
+      if (!q) {
+        RECO_FILTERED = RECO_ALL.slice();
+        $("searchHint").textContent = "";
+      } else {
+        RECO_FILTERED = RECO_ALL.filter(v =>
+          String(v.title||"").toLowerCase().includes(q) ||
+          String(v.genre||"").toLowerCase().includes(q)
+        );
+        $("searchHint").textContent = `${RECO_FILTERED.length} hasil`;
+      }
+
+      const wide = RECO_FILTERED.filter(v => v.poster_wide_url).slice(0, 12);
+      const grid = RECO_FILTERED.filter(v => !v.poster_wide_url).slice(0, 10);
+
+      renderWideReco(wide);
+      renderRecoGrid(grid);
+    }
+
+    // Actions
+    async function copyText(text){
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch {}
+        document.body.removeChild(ta);
+        return true;
+      }
+    }
+
+    // Init
+    async function init(){
+      $("btnSearch").addEventListener("click", ()=>toggleSearch());
+      $("btnMenu").addEventListener("click", ()=>openDrawer(true));
+      $("btnClose").addEventListener("click", ()=>openDrawer(false));
+      $("drawerMask").addEventListener("click", ()=>openDrawer(false));
+      $("q").addEventListener("input", debounce(applyRecoSearch, 120));
+
+      $("wideRecoPrev").onclick = ()=>scrollByCard($("wideRecoTrack"), -1);
+      $("wideRecoNext").onclick = ()=>scrollByCard($("wideRecoTrack"), 1);
+
+      const id = getId();
+      if (!id) {
+        $("videoTitle").textContent = "Not Found";
+        $("playerWrap").innerHTML = `<div style="padding:14px">Not Found</div>`;
+        return;
+      }
+
+      const all = await loadVideos();
+      renderGenres(all);
+
+      const v = all.find(x => Number(x.id) === id);
+      if (!v) {
+        $("videoTitle").textContent = "Not Found";
+        $("playerWrap").innerHTML = `<div style="padding:14px">Not Found</div>`;
+        return;
+      }
+
+      // title
+      $("videoTitle").textContent = v.title || "Untitled";
+
+      // servers
+      const servers = buildServers(v);
+      if (!servers.length) {
+        $("playerWrap").innerHTML = `<div style="padding:14px">No server</div>`;
+      } else {
+        renderServerButtons(servers, (s) => renderPlayer(s, v.title || "Untitled"));
+        await renderPlayer(servers[0], v.title || "Untitled");
+      }
+
+      // actions
+      $("btnCopy").onclick = async () => {
+        const u = currentServer?.url || location.href;
+        await copyText(u);
+      };
+
+      $("btnShare").onclick = async () => {
+        const shareUrl = location.href;
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: v.title || "videypro", url: shareUrl });
+          } catch {}
+        } else {
+          await copyText(shareUrl);
+        }
+      };
+
+      // views after 10s
+      incViewsAfter10s(id);
+
+      // Recommended: exclude current id, sort by views desc
+      RECO_ALL = all
+        .filter(x => Number(x.id) !== id)
+        .sort((a,b) => Number(b.views||0) - Number(a.views||0));
+
+      RECO_FILTERED = RECO_ALL.slice();
+
+      applyRecoSearch();
+    }
+
+    init().catch(e => {
+      $("videoTitle").textContent = "Error";
+      $("playerWrap").innerHTML = `<div style="padding:14px">${esc(e.message || e)}</div>`;
+    });
+  </script>
 </body>
-</html>
+  </html>
