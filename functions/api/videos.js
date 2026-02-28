@@ -3,6 +3,8 @@ export async function onRequestGet({ env }) {
     const { results } = await env.DB.prepare(`
       SELECT
         id, title, genre, thumbnail_url, created_at,
+        views,
+        type, url,
         server1_type, server1_url,
         server2_type, server2_url,
         server3_type, server3_url,
