@@ -28,7 +28,7 @@
     a{color:inherit;text-decoration:none}
     img{max-width:100%;display:block}
 
-    /* Header (sama kayak index) */
+    /* Header sama index */
     .header{
       position:sticky; top:0; z-index:50;
       background:rgba(10,10,10,.85);
@@ -54,7 +54,6 @@
       font-size:16px; line-height:1;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-
     .right{display:flex; align-items:center; gap:8px}
     .iconbtn{
       width:38px; height:38px;
@@ -66,7 +65,6 @@
     .iconbtn:hover{border-color:#2b2b2b}
     .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 
-    /* Search dropdown (toggle) */
     .searchWrap{
       max-width:var(--max); margin:0 auto;
       padding:0 12px 10px;
@@ -148,13 +146,26 @@
     iframe{width:100%; height:100%; border:0; display:block; background:#000}
     .iframeBox{aspect-ratio:16/9; width:100%; background:#000}
 
-    .title{
+    .titleRow{
+      display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
       margin:10px 2px 0;
+    }
+    .title{
       font-size:16px;
       font-weight:900;
       line-height:1.25;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
     }
+    .metaMini{
+      flex:0 0 auto;
+      font-size:12px; color:var(--muted);
+      display:flex; align-items:center; gap:8px;
+      padding-top:2px;
+    }
+    .dot{opacity:.6}
 
     /* Server buttons */
     .serverRow{
@@ -169,13 +180,13 @@
       padding:9px 12px;
       cursor:pointer;
       font-size:13px;
-      font-weight:800;
+      font-weight:900;
       opacity:.95;
     }
     .sbtn:hover{border-color:#2b2b2b}
     .sbtn.on{background:#0b1220;border-color:#2b3a57}
 
-    /* Action buttons */
+    /* Action buttons (rapi) */
     .actionRow{
       display:flex; gap:10px; flex-wrap:wrap;
       margin-top:10px;
@@ -188,11 +199,18 @@
       padding:10px 12px;
       cursor:pointer;
       font-size:13px;
-      font-weight:800;
+      font-weight:900;
       display:flex; align-items:center; gap:8px;
+      min-width:110px;
+      justify-content:center;
     }
     .abtn:hover{border-color:#2b2b2b}
     .abtn svg{width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
+    .abtn.primary{background:#0b1220;border-color:#2b3a57}
+    .abtn.primary:hover{border-color:#3a4d75}
+    @media (max-width:420px){
+      .abtn{flex:1; min-width:0}
+    }
 
     /* Recommended */
     .carousel{position:relative}
@@ -292,7 +310,6 @@
 </head>
 
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="bar">
       <a class="left" href="/" aria-label="home">
@@ -321,7 +338,6 @@
     </div>
   </header>
 
-  <!-- Drawer -->
   <div class="drawerMask" id="drawerMask"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawerTop">
@@ -345,33 +361,36 @@
   </aside>
 
   <main class="wrap">
-    <!-- Player -->
     <section class="card playerCard">
-      <div class="playerWrap" id="playerWrap">
-        <!-- injected -->
-      </div>
+      <div class="playerWrap" id="playerWrap"></div>
 
-      <div class="title" id="videoTitle">Loading...</div>
+      <div class="titleRow">
+        <div class="title" id="videoTitle">Loading...</div>
+        <div class="metaMini">
+          <span id="viewsText">0 views</span>
+          <span class="dot">•</span>
+          <span id="serverTypeText">-</span>
+        </div>
+      </div>
 
       <div class="serverRow" id="serverRow"></div>
 
       <div class="actionRow" id="actionRow">
-        <button class="abtn" id="btnCopy" type="button" aria-label="copy">
+        <button class="abtn" id="btnCopy" type="button">
           <svg viewBox="0 0 24 24"><path d="M9 9h10v10H9z"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
           Copy
         </button>
-        <button class="abtn" id="btnShare" type="button" aria-label="share">
+        <button class="abtn primary" id="btnShare" type="button">
           <svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>
           Share
         </button>
-        <a class="abtn hide" id="btnDownload" aria-label="download">
+        <button class="abtn hide" id="btnDownload" type="button">
           <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
           Unduh
-        </a>
+        </button>
       </div>
     </section>
 
-    <!-- Recommended -->
     <section style="margin-top:14px">
       <div class="sectionTitle">
         <h2>Direkomendasikan</h2>
@@ -421,9 +440,11 @@
       return Array.isArray(data) ? data : [];
     }
 
-    async function incViewsAfter10s(id){
+    // views: optimistic update + POST after 10s
+    function incViewsAfter10s(id, onOptimistic){
       if (!id) return;
       setTimeout(() => {
+        try { onOptimistic?.(); } catch {}
         fetch("/api/views", {
           method:"POST",
           headers:{ "Content-Type":"application/json" },
@@ -432,7 +453,6 @@
       }, 10000);
     }
 
-    // Header controls
     function toggleSearch(force){
       const w = $("searchWrap");
       const on = typeof force === "boolean" ? force : !w.classList.contains("on");
@@ -444,6 +464,7 @@
         applyRecoSearch();
       }
     }
+
     function openDrawer(open){
       const mask = $("drawerMask");
       const d = $("drawer");
@@ -453,7 +474,6 @@
       d.setAttribute("aria-hidden", on ? "false" : "true");
     }
 
-    // Drawer genres (same style)
     function renderGenres(all){
       const set = new Set();
       all.forEach(v => {
@@ -465,7 +485,6 @@
       wrap.innerHTML = genres.map(g => `<a class="navItem" href="/">${esc(g)}</a>`).join("");
     }
 
-    // Build server list from video row
     function buildServers(v){
       const servers = [];
       for (let i=1;i<=4;i++){
@@ -473,21 +492,17 @@
         const u = (v[`server${i}_url`] || "").toString().trim();
         if (t && u) servers.push({ label: `Server ${i}`, type: t, url: u });
       }
-      // fallback legacy
       if (!servers.length && v.type && v.url) {
         servers.push({ label: "Server 1", type: String(v.type), url: String(v.url) });
       }
       return servers;
     }
 
-    // Player rendering
     let currentServer = null;
-    let currentVideoEl = null;
     let currentHls = null;
 
     function destroyPlayer(){
       try { if (currentHls) { currentHls.destroy(); currentHls = null; } } catch {}
-      currentVideoEl = null;
       $("playerWrap").innerHTML = "";
     }
 
@@ -503,64 +518,49 @@
       return window.Hls;
     }
 
-    async function renderPlayer(server, title){
+    async function renderPlayer(server){
       destroyPlayer();
       currentServer = server;
 
-      // Update action buttons
-      const dl = $("btnDownload");
-      const isMp4 = (server.type || "").toLowerCase() === "mp4" || (server.url || "").toLowerCase().endsWith(".mp4");
-      if (isMp4) {
-        dl.classList.remove("hide");
-        dl.href = server.url;
-        dl.download = "";
-        dl.target = "_blank";
-        dl.rel = "noopener";
-      } else {
-        dl.classList.add("hide");
-        dl.removeAttribute("href");
-      }
-
       const t = (server.type || "").toLowerCase();
-      const u = server.url;
+      $("serverTypeText").textContent = t ? t.toUpperCase() : "-";
+
+      // download button behavior
+      const isMp4 = t === "mp4" || (server.url || "").toLowerCase().endsWith(".mp4");
+      $("btnDownload").classList.toggle("hide", !isMp4);
 
       if (t === "iframe") {
         $("playerWrap").innerHTML = `
           <div class="iframeBox">
-            <iframe src="${esc(u)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            <iframe src="${esc(server.url)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
           </div>
         `;
         return;
       }
 
-      // mp4/hls pakai <video>
       $("playerWrap").innerHTML = `<video id="v" controls playsinline preload="metadata"></video>`;
       const video = $("v");
-      currentVideoEl = video;
 
       if (t === "mp4") {
-        video.src = u;
+        video.src = server.url;
         return;
       }
 
       // HLS
-      // coba native dulu (Safari/iOS)
       if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = u;
+        video.src = server.url;
         return;
       }
 
-      // lazy-load hls.js untuk chrome/firefox
       const Hls = await ensureHlsJs();
       if (Hls && Hls.isSupported()) {
         currentHls = new Hls({ enableWorker: true, lowLatencyMode: true });
-        currentHls.loadSource(u);
+        currentHls.loadSource(server.url);
         currentHls.attachMedia(video);
       } else {
-        // fallback: buka link di tab baru
         $("playerWrap").innerHTML = `
           <div class="card" style="padding:14px;border-radius:14px">
-            <a href="${esc(u)}" target="_blank" rel="noopener">Open Stream</a>
+            <a href="${esc(server.url)}" target="_blank" rel="noopener">Open Stream</a>
           </div>
         `;
       }
@@ -661,7 +661,6 @@
       renderRecoGrid(grid);
     }
 
-    // Actions
     async function copyText(text){
       try {
         await navigator.clipboard.writeText(text);
@@ -679,7 +678,21 @@
       }
     }
 
-    // Init
+    // FORCE DOWNLOAD (bukan buka link)
+    async function forceDownloadMp4(url, filename){
+      const r = await fetch(url, { mode:"cors" });
+      if (!r.ok) throw new Error("Gagal download");
+      const blob = await r.blob();
+      const a = document.createElement("a");
+      const obj = URL.createObjectURL(blob);
+      a.href = obj;
+      a.download = filename || "video.mp4";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(obj);
+    }
+
     async function init(){
       $("btnSearch").addEventListener("click", ()=>toggleSearch());
       $("btnMenu").addEventListener("click", ()=>openDrawer(true));
@@ -707,19 +720,19 @@
         return;
       }
 
-      // title
+      // Title & views
       $("videoTitle").textContent = v.title || "Untitled";
+      $("viewsText").textContent = `${fmtViews(v.views)} views`;
 
-      // servers
       const servers = buildServers(v);
       if (!servers.length) {
         $("playerWrap").innerHTML = `<div style="padding:14px">No server</div>`;
       } else {
-        renderServerButtons(servers, (s) => renderPlayer(s, v.title || "Untitled"));
-        await renderPlayer(servers[0], v.title || "Untitled");
+        renderServerButtons(servers, (s) => renderPlayer(s));
+        await renderPlayer(servers[0]);
       }
 
-      // actions
+      // Actions
       $("btnCopy").onclick = async () => {
         const u = currentServer?.url || location.href;
         await copyText(u);
@@ -728,24 +741,43 @@
       $("btnShare").onclick = async () => {
         const shareUrl = location.href;
         if (navigator.share) {
-          try {
-            await navigator.share({ title: v.title || "videypro", url: shareUrl });
-          } catch {}
+          try { await navigator.share({ title: v.title || "videypro", url: shareUrl }); } catch {}
         } else {
           await copyText(shareUrl);
         }
       };
 
-      // views after 10s
-      incViewsAfter10s(id);
+      $("btnDownload").onclick = async () => {
+        const t = (currentServer?.type || "").toLowerCase();
+        const u = currentServer?.url || "";
+        const isMp4 = t === "mp4" || u.toLowerCase().endsWith(".mp4");
+        if (!isMp4) return;
+        try{
+          const safe = (v.title || "videypro").replace(/[\\\/:*?"<>|]+/g, "").slice(0,80).trim();
+          await forceDownloadMp4(u, (safe ? safe + ".mp4" : "video.mp4"));
+        }catch(e){
+          // fallback: kalau CORS mp4 gak allow, ya buka link
+          window.open(u, "_blank", "noopener,noreferrer");
+        }
+      };
+
+      // Views optimistic + refresh reco badges
+      let bumped = false;
+      incViewsAfter10s(id, () => {
+        if (bumped) return;
+        bumped = true;
+        v.views = Number(v.views||0) + 1;
+        $("viewsText").textContent = `${fmtViews(v.views)} views`;
+        // update juga list rekomendasi (biar “kerasa”)
+        RECO_ALL = RECO_ALL.map(x => (Number(x.id) === id ? ({...x, views: v.views}) : x));
+        applyRecoSearch();
+      });
 
       // Recommended: exclude current id, sort by views desc
       RECO_ALL = all
         .filter(x => Number(x.id) !== id)
         .sort((a,b) => Number(b.views||0) - Number(a.views||0));
-
       RECO_FILTERED = RECO_ALL.slice();
-
       applyRecoSearch();
     }
 
@@ -755,4 +787,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
