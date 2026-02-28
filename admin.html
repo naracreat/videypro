@@ -88,13 +88,23 @@
 
         <div class="row">
           <div>
-            <label>Thumbnail URL</label>
+            <label>Thumbnail URL (16:9)</label>
             <input id="thumbnail_url" placeholder="https://.../thumb.jpg" />
           </div>
+          <div>
+            <label>Poster 19:6 URL (opsional)</label>
+            <input id="poster_wide_url" placeholder="https://.../poster_wide.jpg" />
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row">
           <div>
             <label>Editing ID (auto isi kalau klik Edit)</label>
             <input id="edit_id" placeholder="ID" disabled />
           </div>
+          <div></div>
         </div>
 
         <div style="height:12px"></div>
@@ -214,6 +224,7 @@
       title: $("title").value.trim(),
       genre: $("genre").value.trim(),
       thumbnail_url: $("thumbnail_url").value.trim(),
+      poster_wide_url: $("poster_wide_url").value.trim(),
     };
 
     for (let i=1;i<=SERVER_COUNT;i++){
@@ -223,6 +234,7 @@
 
     if (!payload.genre) delete payload.genre;
     if (!payload.thumbnail_url) delete payload.thumbnail_url;
+    if (!payload.poster_wide_url) delete payload.poster_wide_url;
 
     return payload;
   }
@@ -291,6 +303,7 @@
     $("title").value = "";
     $("genre").value = "";
     $("thumbnail_url").value = "";
+    $("poster_wide_url").value = "";
     for (let i=1;i<=SERVER_COUNT;i++){
       $(`server${i}_type`).value = "";
       $(`server${i}_url`).value = "";
@@ -304,6 +317,7 @@
     $("title").value = v.title || "";
     $("genre").value = v.genre || "";
     $("thumbnail_url").value = v.thumbnail_url || "";
+    $("poster_wide_url").value = v.poster_wide_url || "";
     for (let i=1;i<=SERVER_COUNT;i++){
       $(`server${i}_type`).value = v[`server${i}_type`] || "";
       $(`server${i}_url`).value  = v[`server${i}_url`]  || "";
@@ -327,7 +341,7 @@
               <span class="idpill">#${v.id}</span>
               <div style="font-weight:800">${esc(v.title||"")}</div>
             </div>
-            <div class="small">${esc(v.genre||"")}</div>
+            <div class="small">${esc(v.genre||"")}${v.poster_wide_url ? " • 19:6" : ""}</div>
           </div>
           <div class="small">${esc(v.created_at||"")}</div>
           <div class="btns" style="justify-content:flex-end">
