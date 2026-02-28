@@ -14,7 +14,6 @@
       --line:#1f1f1f;
       --muted:#9ca3af;
       --text:#fff;
-      --acc:#60a5fa;
       --r:16px;
       --max:1080px;
     }
@@ -40,9 +39,7 @@
       padding:10px 12px;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .left{
-      display:flex; align-items:center; gap:10px; min-width:0;
-    }
+    .left{display:flex; align-items:center; gap:10px; min-width:0}
     .logo{
       width:28px; height:28px; border-radius:8px;
       background:#000; border:1px solid var(--line);
@@ -65,11 +62,8 @@
     .iconbtn:hover{border-color:#2b2b2b}
     .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 
-    .searchWrap{
-      max-width:var(--max); margin:0 auto;
-      padding:0 12px 10px;
-      display:none;
-    }
+    /* Search dropdown */
+    .searchWrap{max-width:var(--max); margin:0 auto; padding:0 12px 10px; display:none}
     .searchWrap.on{display:block}
     .searchBox{
       display:flex; gap:10px; align-items:center;
@@ -77,24 +71,17 @@
       border-radius:14px; padding:10px 12px;
     }
     .searchBox input{
-      flex:1; border:0; outline:0;
-      background:transparent; color:#fff;
-      font-size:14px;
+      flex:1; border:0; outline:0; background:transparent; color:#fff; font-size:14px;
     }
     .searchHint{color:var(--muted); font-size:12px}
 
     /* Drawer */
-    .drawerMask{
-      position:fixed; inset:0; z-index:60;
-      background:rgba(0,0,0,.55);
-      display:none;
-    }
+    .drawerMask{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.55); display:none}
     .drawerMask.on{display:block}
     .drawer{
       position:fixed; top:0; right:-320px; height:100%; width:320px; z-index:61;
       background:#0d0d0d; border-left:1px solid var(--line);
-      transition:right .2s ease;
-      padding:14px;
+      transition:right .2s ease; padding:14px;
     }
     .drawer.on{right:0}
     .drawerTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
@@ -106,72 +93,56 @@
     }
     .navList{margin-top:12px; display:flex; flex-direction:column; gap:8px}
     .navItem{
-      padding:10px 12px;
-      border-radius:12px;
-      background:#0b0b0b;
-      border:1px solid var(--line);
-      cursor:pointer;
-      font-size:14px;
+      padding:10px 12px; border-radius:12px; background:#0b0b0b;
+      border:1px solid var(--line); cursor:pointer; font-size:14px;
     }
     .navItem:hover{border-color:#2b2b2b}
     .navSection{margin-top:10px; color:var(--muted); font-size:12px}
 
     /* Layout */
     .wrap{max-width:var(--max); margin:0 auto; padding:14px 12px 0}
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      overflow:hidden;
-    }
-    .sectionTitle{
-      display:flex; align-items:center; justify-content:space-between;
-      margin:12px 0 10px;
-    }
-    .sectionTitle h2{
-      margin:0; font-size:14px; letter-spacing:.2px;
-      color:#e5e7eb; font-weight:800;
-    }
+    .card{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; margin:12px 0 10px}
+    .sectionTitle h2{margin:0; font-size:14px; letter-spacing:.2px; color:#e5e7eb; font-weight:800}
 
-    /* Player */
+    /* Player locked 16:9 */
     .playerCard{padding:10px}
-    .playerWrap{
+    .ratio16{
       width:100%;
+      aspect-ratio:16/9;
       background:#000;
       border:1px solid var(--line);
       border-radius:14px;
       overflow:hidden;
+      position:relative;
     }
-    video{width:100%; height:auto; display:block; background:#000}
-    iframe{width:100%; height:100%; border:0; display:block; background:#000}
-    .iframeBox{aspect-ratio:16/9; width:100%; background:#000}
+    .ratio16 > video,
+    .ratio16 > iframe{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      display:block;
+      background:#000;
+    }
+    .ratio16 > video{object-fit:contain}
 
     .titleRow{
       display:flex; gap:10px; align-items:flex-start; justify-content:space-between;
       margin:10px 2px 0;
     }
     .title{
-      font-size:16px;
-      font-weight:900;
-      line-height:1.25;
+      font-size:16px; font-weight:900; line-height:1.25;
       overflow:hidden;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
     }
     .metaMini{
-      flex:0 0 auto;
-      font-size:12px; color:var(--muted);
-      display:flex; align-items:center; gap:8px;
-      padding-top:2px;
+      flex:0 0 auto; font-size:12px; color:var(--muted);
+      display:flex; align-items:center; gap:8px; padding-top:2px;
+      white-space:nowrap;
     }
     .dot{opacity:.6}
 
     /* Server buttons */
-    .serverRow{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-top:10px;
-    }
+    .serverRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
     .sbtn{
       border:1px solid var(--line);
       background:#0d0d0d;
@@ -186,11 +157,8 @@
     .sbtn:hover{border-color:#2b2b2b}
     .sbtn.on{background:#0b1220;border-color:#2b3a57}
 
-    /* Action buttons (rapi) */
-    .actionRow{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top:10px;
-    }
+    /* Action buttons */
+    .actionRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
     .abtn{
       border:1px solid var(--line);
       background:#0d0d0d;
@@ -234,10 +202,7 @@
     .thumb196{aspect-ratio:19/6;background:#000;position:relative}
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
-    .ctitle{
-      font-weight:900; font-size:13px; line-height:1.2;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .ctitle{font-weight:900; font-size:13px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .csub{margin-top:6px; font-size:12px; color:var(--muted)}
     .carBtns{
       position:absolute; inset:0; pointer-events:none;
@@ -263,22 +228,13 @@
     @media (min-width:900px){
       .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
     }
-    .gcard{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      overflow:hidden;
-    }
+    .gcard{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
     .thumb169{aspect-ratio:16/9;background:#000;position:relative}
     .gcard img{width:100%;height:100%;object-fit:cover}
     .gmeta{padding:10px 10px 12px}
-    .gtitle{
-      font-weight:900;font-size:13px;line-height:1.2;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .gtitle{font-weight:900;font-size:13px;line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .gsub{margin-top:6px;font-size:12px;color:var(--muted)}
 
-    /* Badges */
     .badgeHD{
       position:absolute; top:8px; left:8px;
       padding:4px 8px; border-radius:999px;
@@ -295,7 +251,6 @@
       color:#e5e7eb;
     }
 
-    /* Footer */
     .footer{
       border-top:1px solid var(--line);
       margin-top:14px;
@@ -304,7 +259,6 @@
       font-size:12px;
       text-align:center;
     }
-
     .hide{display:none!important}
   </style>
 </head>
@@ -362,7 +316,7 @@
 
   <main class="wrap">
     <section class="card playerCard">
-      <div class="playerWrap" id="playerWrap"></div>
+      <div class="ratio16" id="playerWrap"></div>
 
       <div class="titleRow">
         <div class="title" id="videoTitle">Loading...</div>
@@ -420,6 +374,8 @@
   <script>
     const $ = (id) => document.getElementById(id);
     const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
+    const DIRECT_LINK = "https://ow.oaksdauke.com/i7RjuaYVPV5/131416";
+
     const esc = (s="") => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
 
@@ -427,12 +383,10 @@
       const x = Number(n || 0);
       try { return x.toLocaleString("id-ID"); } catch { return String(x); }
     }
-
     function getId(){
       const u = new URL(location.href);
       return Number(u.searchParams.get("id") || 0);
     }
-
     async function loadVideos(){
       const r = await fetch("/api/videos", { cache: "no-store" });
       if (!r.ok) throw new Error(await r.text());
@@ -440,7 +394,7 @@
       return Array.isArray(data) ? data : [];
     }
 
-    // views: optimistic update + POST after 10s
+    // Views: optimistic + POST after 10s
     function incViewsAfter10s(id, onOptimistic){
       if (!id) return;
       setTimeout(() => {
@@ -453,6 +407,7 @@
       }, 10000);
     }
 
+    // Header controls
     function toggleSearch(force){
       const w = $("searchWrap");
       const on = typeof force === "boolean" ? force : !w.classList.contains("on");
@@ -464,7 +419,6 @@
         applyRecoSearch();
       }
     }
-
     function openDrawer(open){
       const mask = $("drawerMask");
       const d = $("drawer");
@@ -498,6 +452,15 @@
       return servers;
     }
 
+    // DIRECT GATE: sebelum ganti server / download
+    function goDirectThen(fn){
+      // buka direct link dulu (popup-safe karena dipanggil dari user click)
+      try { window.open(DIRECT_LINK, "_blank", "noopener,noreferrer"); } catch {}
+      // lanjut aksi utama
+      setTimeout(() => { try { fn(); } catch {} }, 60);
+    }
+
+    // Player
     let currentServer = null;
     let currentHls = null;
 
@@ -525,15 +488,12 @@
       const t = (server.type || "").toLowerCase();
       $("serverTypeText").textContent = t ? t.toUpperCase() : "-";
 
-      // download button behavior
       const isMp4 = t === "mp4" || (server.url || "").toLowerCase().endsWith(".mp4");
       $("btnDownload").classList.toggle("hide", !isMp4);
 
       if (t === "iframe") {
         $("playerWrap").innerHTML = `
-          <div class="iframeBox">
-            <iframe src="${esc(server.url)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-          </div>
+          <iframe src="${esc(server.url)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
         `;
         return;
       }
@@ -558,15 +518,14 @@
         currentHls.loadSource(server.url);
         currentHls.attachMedia(video);
       } else {
+        // fallback
         $("playerWrap").innerHTML = `
-          <div class="card" style="padding:14px;border-radius:14px">
-            <a href="${esc(server.url)}" target="_blank" rel="noopener">Open Stream</a>
-          </div>
+          <iframe src="${esc(server.url)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
         `;
       }
     }
 
-    function renderServerButtons(servers, onPick){
+    function renderServerButtons(servers){
       const row = $("serverRow");
       row.innerHTML = servers.map((s, idx) => `
         <button class="sbtn ${idx===0 ? "on":""}" type="button" data-i="${idx}">${esc(s.label)}</button>
@@ -575,9 +534,12 @@
       row.querySelectorAll("[data-i]").forEach(btn => {
         btn.onclick = () => {
           const i = Number(btn.getAttribute("data-i"));
-          row.querySelectorAll(".sbtn").forEach(b=>b.classList.remove("on"));
-          btn.classList.add("on");
-          onPick(servers[i]);
+          // direct link dulu baru switch
+          goDirectThen(async () => {
+            row.querySelectorAll(".sbtn").forEach(b=>b.classList.remove("on"));
+            btn.classList.add("on");
+            await renderPlayer(servers[i]);
+          });
         };
       });
     }
@@ -662,23 +624,17 @@
     }
 
     async function copyText(text){
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch {
         const ta = document.createElement("textarea");
-        ta.value = text;
-        ta.style.position = "fixed";
-        ta.style.left = "-9999px";
-        document.body.appendChild(ta);
-        ta.select();
+        ta.value = text; ta.style.position="fixed"; ta.style.left="-9999px";
+        document.body.appendChild(ta); ta.select();
         try { document.execCommand("copy"); } catch {}
         document.body.removeChild(ta);
         return true;
       }
     }
 
-    // FORCE DOWNLOAD (bukan buka link)
     async function forceDownloadMp4(url, filename){
       const r = await fetch(url, { mode:"cors" });
       if (!r.ok) throw new Error("Gagal download");
@@ -699,7 +655,6 @@
       $("btnClose").addEventListener("click", ()=>openDrawer(false));
       $("drawerMask").addEventListener("click", ()=>openDrawer(false));
       $("q").addEventListener("input", debounce(applyRecoSearch, 120));
-
       $("wideRecoPrev").onclick = ()=>scrollByCard($("wideRecoTrack"), -1);
       $("wideRecoNext").onclick = ()=>scrollByCard($("wideRecoTrack"), 1);
 
@@ -720,7 +675,6 @@
         return;
       }
 
-      // Title & views
       $("videoTitle").textContent = v.title || "Untitled";
       $("viewsText").textContent = `${fmtViews(v.views)} views`;
 
@@ -728,11 +682,11 @@
       if (!servers.length) {
         $("playerWrap").innerHTML = `<div style="padding:14px">No server</div>`;
       } else {
-        renderServerButtons(servers, (s) => renderPlayer(s));
+        renderServerButtons(servers);
         await renderPlayer(servers[0]);
       }
 
-      // Actions
+      // actions
       $("btnCopy").onclick = async () => {
         const u = currentServer?.url || location.href;
         await copyText(u);
@@ -747,33 +701,33 @@
         }
       };
 
-      $("btnDownload").onclick = async () => {
-        const t = (currentServer?.type || "").toLowerCase();
-        const u = currentServer?.url || "";
-        const isMp4 = t === "mp4" || u.toLowerCase().endsWith(".mp4");
-        if (!isMp4) return;
-        try{
-          const safe = (v.title || "videypro").replace(/[\\\/:*?"<>|]+/g, "").slice(0,80).trim();
-          await forceDownloadMp4(u, (safe ? safe + ".mp4" : "video.mp4"));
-        }catch(e){
-          // fallback: kalau CORS mp4 gak allow, ya buka link
-          window.open(u, "_blank", "noopener,noreferrer");
-        }
+      $("btnDownload").onclick = () => {
+        // direct link dulu baru download
+        goDirectThen(async () => {
+          const t = (currentServer?.type || "").toLowerCase();
+          const u = currentServer?.url || "";
+          const isMp4 = t === "mp4" || u.toLowerCase().endsWith(".mp4");
+          if (!isMp4) return;
+          try{
+            const safe = (v.title || "videypro").replace(/[\\\/:*?"<>|]+/g, "").slice(0,80).trim();
+            await forceDownloadMp4(u, (safe ? safe + ".mp4" : "video.mp4"));
+          }catch(e){
+            // kalau CORS mp4 gak allow, fallback buka link
+            window.open(u, "_blank", "noopener,noreferrer");
+          }
+        });
       };
 
-      // Views optimistic + refresh reco badges
+      // views optimistic + POST after 10s
       let bumped = false;
       incViewsAfter10s(id, () => {
         if (bumped) return;
         bumped = true;
         v.views = Number(v.views||0) + 1;
         $("viewsText").textContent = `${fmtViews(v.views)} views`;
-        // update juga list rekomendasi (biar “kerasa”)
-        RECO_ALL = RECO_ALL.map(x => (Number(x.id) === id ? ({...x, views: v.views}) : x));
-        applyRecoSearch();
       });
 
-      // Recommended: exclude current id, sort by views desc
+      // recommended exclude current
       RECO_ALL = all
         .filter(x => Number(x.id) !== id)
         .sort((a,b) => Number(b.views||0) - Number(a.views||0));
@@ -785,6 +739,14 @@
       $("videoTitle").textContent = "Error";
       $("playerWrap").innerHTML = `<div style="padding:14px">${esc(e.message || e)}</div>`;
     });
+  </script>
+
+  <!-- Popunder script (sesuai yang lu kasih) -->
+  <script>
+    (function(s){
+      s.dataset.zone='10109877',
+      s.src='https://al5sm.com/tag.min.js'
+    })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
   </script>
 </body>
 </html>
