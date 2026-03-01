@@ -124,6 +124,7 @@
     .sectionTitle{
       display:flex; align-items:center; justify-content:space-between;
       margin:10px 0 10px;
+      gap:10px;
     }
     .sectionTitle h2{
       margin:0; font-size:14px; letter-spacing:.2px;
@@ -145,7 +146,7 @@
     .track::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
     .citem{
       flex:0 0 auto;
-      width:220px; /* FIX: kecilin popular + umum (sebelumnya 260px) */
+      width:220px; /* kecilin popular + umum */
       scroll-snap-align:start;
       background:var(--card);
       border:1px solid var(--line);
@@ -153,8 +154,8 @@
       overflow:hidden;
     }
 
-    /* FIX: kecilin poster tiktok (sebelumnya 190px) */
-    .citem.tiktok{ width:160px; }
+    /* FIX: poster tiktok lebih kecil lagi */
+    .citem.tiktok{ width:120px; }
 
     .thumb169{aspect-ratio:16/9;background:#000;height:auto}
     /* thumb196 dipakai poster tiktok 9:16 */
@@ -242,6 +243,7 @@
       cursor:pointer;
       font-size:13px;
       padding:0 10px;
+      color:#fff;
     }
     .pbtn:hover{border-color:#2b2b2b}
     .pbtn.on{background:#0b1220;border-color:#2b3a57;color:#fff}
@@ -336,10 +338,11 @@
       </div>
     </section>
 
-    <!-- Poster (tiktok 9:16) -->
+    <!-- Poster (tiktok 9:16) - cuma di bawah popular -->
     <section id="wideSection" class="hide" style="margin-top:14px">
       <div class="sectionTitle">
         <h2>Poster</h2>
+        <button id="seeAllPoster" class="pbtn" type="button">See All</button>
       </div>
       <div class="carousel">
         <div class="track" id="wideTrack"></div>
@@ -382,10 +385,11 @@
     let filtered = [];
     let currentPage = 1;
     let currentGenre = ""; // filter dari drawer
+    let showAllPoster = false; // tombol See All poster
 
     // ---------- API ----------
     async function loadVideos(){
-      // FIX: bener-bener bust cache + edge stale
+      // bust cache + edge stale
       const url = `/api/videos?t=${Date.now()}`;
       const r = await fetch(url, { cache: "no-store" });
       if (!r.ok) throw new Error(await r.text());
@@ -636,9 +640,13 @@
         $("popularSection").classList.add("hide");
       }
 
+      // Poster section: ada tombol See All
       if (posters.length){
         $("wideSection").classList.remove("hide");
-        renderCarousel($("wideTrack"), posters.slice(0, 20), "wide");
+        // kalau See All ON -> tampilkan semua poster, kalau OFF -> tampilkan 20 pertama
+        renderCarousel($("wideTrack"), showAllPoster ? posters : posters.slice(0, 20), "wide");
+        const btn = $("seeAllPoster");
+        if (btn) btn.textContent = showAllPoster ? "Show Less" : "See All";
       } else {
         $("wideSection").classList.add("hide");
       }
@@ -696,6 +704,15 @@
       $("popularNext").onclick = ()=>scrollByCard($("popularTrack"), 1);
       $("widePrev").onclick = ()=>scrollByCard($("wideTrack"), -1);
       $("wideNext").onclick = ()=>scrollByCard($("wideTrack"), 1);
+
+      // See All poster toggle
+      const seeAllBtn = $("seeAllPoster");
+      if (seeAllBtn){
+        seeAllBtn.onclick = () => {
+          showAllPoster = !showAllPoster;
+          renderList();
+        };
+      }
 
       $("q").addEventListener("input", debounce(applyFilters, 120));
 
