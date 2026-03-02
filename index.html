@@ -185,6 +185,66 @@
     .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
     .carBtn:hover{border-color:#2b2b2b}
 
+    /* ====== TAMBAHAN: SECTION MODEL NEKOPOI (HORIZONTAL PER GENRE) ====== */
+    .sec{
+      margin-top:14px;
+    }
+    .secHead{
+      display:flex; align-items:center; justify-content:space-between;
+      margin:10px 0 10px;
+      gap:12px;
+    }
+    .secHead .h{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+      color:#e5e7eb;
+      font-weight:800;
+    }
+    .secHead .more{
+      font-size:13px;
+      color:#f5a5c6;
+      opacity:.95;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .secHead .more:hover{opacity:1}
+
+    .row{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      scroll-snap-type:x mandatory;
+      padding-bottom:6px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .row::-webkit-scrollbar{height:8px}
+    .row::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
+
+    .miniCard{
+      flex:0 0 auto;
+      width:170px;               /* ukuran card kecil */
+      scroll-snap-align:start;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    .miniThumb{aspect-ratio:16/9;background:#000}
+    .miniThumb img{width:100%;height:100%;object-fit:cover}
+    .miniMeta{padding:8px 10px 10px}
+    .miniTitle{
+      font-weight:800;
+      font-size:12px;
+      line-height:1.2;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+      min-height:30px;
+    }
+    /* ====== END TAMBAHAN ====== */
+
     /* Grid videos 2 kolom (JANGAN jadi 1 kolom) */
     .grid{
       display:grid;
@@ -357,6 +417,10 @@
         </div>
       </div>
     </section>
+
+    <!-- ====== TAMBAHAN: SECTION KATEGORI HORIZONTAL (ALA NEKOPOI) ====== -->
+    <section id="sectionsWrap"></section>
+    <!-- ====== END TAMBAHAN ====== -->
 
     <!-- Grid -->
     <section style="margin-top:14px">
@@ -623,6 +687,77 @@
       $("listTitle").textContent = byGenre ? `Genre: ${currentGenre}` : "All Videos";
     }
 
+    // ====== TAMBAHAN: render section kategori horizontal ala NekoPoi ======
+    function pickFirstGenre(g){
+      return String(g||"").split(",").map(x=>x.trim()).filter(Boolean)[0] || "Lainnya";
+    }
+
+    function renderSectionsLikeNekopoi(items){
+      const wrap = $("sectionsWrap");
+      if (!wrap) return;
+
+      // pakai video non-poster biar rapi (thumbnail 16:9)
+      const source = items.slice();
+
+      const map = new Map();
+      source.forEach(v=>{
+        const key = pickFirstGenre(v.genre);
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(v);
+      });
+
+      const groups = Array.from(map.entries())
+        .map(([k, arr]) => [k, arr.sort((a,b)=>Number(b.views||0)-Number(a.views||0))])
+        .sort((a,b)=>b[1].length - a[1].length);
+
+      const MAX_SECTION = 6;
+      const PER_SECTION = 10;
+
+      const top = groups
+        .filter(([name, arr]) => arr.length >= 3) // biar gak section kosong2
+        .slice(0, MAX_SECTION);
+
+      if (!top.length){
+        wrap.innerHTML = "";
+        return;
+      }
+
+      wrap.innerHTML = top.map(([name, arr]) => {
+        const list = arr.slice(0, PER_SECTION);
+        return `
+          <section class="sec">
+            <div class="secHead">
+              <h3 class="h">${esc(name)}</h3>
+              <span class="more" data-more-genre="${esc(name)}">selengkapnya...</span>
+            </div>
+            <div class="row">
+              ${list.map(v => `
+                <a class="miniCard" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+                  <div class="miniThumb">
+                    <img loading="lazy" src="${esc(v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
+                  </div>
+                  <div class="miniMeta">
+                    <div class="miniTitle">${esc(v.title || "Untitled")}</div>
+                  </div>
+                </a>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      // klik selengkapnya -> set genre filter
+      wrap.querySelectorAll("[data-more-genre]").forEach(el=>{
+        el.onclick = () => {
+          const g = el.getAttribute("data-more-genre") || "";
+          currentGenre = g;
+          applyFilters();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+      });
+    }
+    // ====== END TAMBAHAN ======
+
     // ---------- Render list ----------
     function renderList(){
       // poster (tiktok) TIDAK masuk All Videos
@@ -651,6 +786,11 @@
       } else {
         $("wideSection").classList.add("hide");
       }
+
+      // ====== TAMBAHAN: section kategori horizontal (di bawah poster) ======
+      // pakai "normal" biar thumbnail 16:9 konsisten kayak contoh
+      renderSectionsLikeNekopoi(normal);
+      // ====== END TAMBAHAN ======
 
       const totalPages = Math.max(1, Math.ceil(normal.length / PAGE_SIZE));
       const page = Math.min(currentPage, totalPages);
