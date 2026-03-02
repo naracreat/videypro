@@ -1,215 +1,693 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>videypro - Genre</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>videypro - Genre</title>
 
-<link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png"/>
+  <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
 
-<style>
-:root{
---bg:#0a0a0a;
---card:#111;
---line:#1f1f1f;
---muted:#9ca3af;
---text:#fff;
---r:16px;
---max:1080px;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui}
-a{text-decoration:none;color:inherit}
-img{display:block;max-width:100%}
+  <style>
+    :root{
+      --bg:#0a0a0a;
+      --card:#111;
+      --line:#1f1f1f;
+      --muted:#9ca3af;
+      --text:#fff;
+      --acc:#60a5fa;
+      --r:16px;
+      --max:1080px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto;
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
 
-/* HEADER */
-.header{position:sticky;top:0;background:#0a0a0ae6;border-bottom:1px solid var(--line);z-index:50}
-.bar{max-width:var(--max);margin:auto;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.left{display:flex;align-items:center;gap:10px}
-.logo{width:28px;height:28px;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-.logo img{width:100%;height:100%;object-fit:cover}
-.brand{font-weight:900}
-.iconbtn{width:38px;height:38px;border-radius:12px;background:#0d0d0d;border:1px solid var(--line);display:grid;place-items:center;cursor:pointer}
-.iconbtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none}
+    /* HEADER */
+    .header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(10,10,10,.85);
+      backdrop-filter:saturate(140%) blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .bar{
+      max-width:var(--max); margin:0 auto;
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .left{display:flex; align-items:center; gap:10px; min-width:0}
+    .logo{
+      width:28px; height:28px; border-radius:8px;
+      background:#000; border:1px solid var(--line);
+      overflow:hidden; flex:0 0 auto;
+    }
+    .logo img{width:100%;height:100%;object-fit:cover}
+    .brand{
+      font-weight:800; letter-spacing:.2px;
+      font-size:16px; line-height:1;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .right{display:flex; align-items:center; gap:8px}
+    .iconbtn{
+      width:38px; height:38px;
+      border-radius:12px;
+      background:#0d0d0d; border:1px solid var(--line);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+    .iconbtn:hover{border-color:#2b2b2b}
+    .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 
-/* LAYOUT */
-.wrap{max-width:var(--max);margin:auto;padding:14px 12px}
-.topRow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.pageTitle{font-size:18px;font-weight:900}
-.backBtn{border:1px solid var(--line);background:#0d0d0d;border-radius:12px;padding:8px 12px;font-weight:900;cursor:pointer}
+    /* Search dropdown */
+    .searchWrap{max-width:var(--max); margin:0 auto; padding:0 12px 10px; display:none}
+    .searchWrap.on{display:block}
+    .searchBox{
+      display:flex; gap:10px; align-items:center;
+      background:#0d0d0d; border:1px solid var(--line);
+      border-radius:14px; padding:10px 12px;
+    }
+    .searchBox input{flex:1; border:0; outline:0; background:transparent; color:#fff; font-size:14px}
+    .searchHint{color:var(--muted); font-size:12px}
 
-/* CONTROLS */
-.controls{display:flex;gap:10px;margin-bottom:12px}
-.select,.btn{border:1px solid var(--line);background:#0d0d0d;border-radius:12px;padding:8px 12px;color:#fff;font-weight:900}
+    /* Drawer */
+    .drawerMask{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.55); display:none}
+    .drawerMask.on{display:block}
+    .drawer{
+      position:fixed; top:0; right:-320px; height:100%; width:320px; z-index:61;
+      background:#0d0d0d; border-left:1px solid var(--line);
+      transition:right .2s ease; padding:14px;
+    }
+    .drawer.on{right:0}
+    .drawerTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .drawerTitle{font-weight:800}
+    .closebtn{
+      width:38px;height:38px;border-radius:12px;
+      background:#0b0b0b;border:1px solid var(--line);
+      display:grid;place-items:center;cursor:pointer;
+    }
+    .navList{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+    .navItem{
+      padding:10px 12px;
+      border-radius:12px;
+      background:#0b0b0b;
+      border:1px solid var(--line);
+      cursor:pointer;
+      font-size:14px;
+    }
+    .navItem:hover{border-color:#2b2b2b}
+    .navSection{margin-top:10px; color:var(--muted); font-size:12px}
 
-/* BLOCK */
-.block{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-top:12px}
-.blockHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.muted{color:var(--muted);font-size:12px}
+    /* Layout */
+    .wrap{max-width:var(--max); margin:0 auto; padding:14px 12px 0}
 
-/* 🔥 POSTER GRID FIX 19:6 */
-.posterGrid{
-display:grid;
-grid-template-columns:repeat(3,minmax(0,1fr));
-gap:10px;
-align-items:start;
-}
+    .topRow{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin:6px 0 12px;
+    }
+    .pageTitle{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .backBtn{
+      border:1px solid var(--line);
+      background:#0d0d0d;
+      color:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .backBtn:hover{border-color:#2b2b2b}
 
-.posterCard{
-background:#0b0b0b;
-border:1px solid rgba(255,255,255,.08);
-border-radius:14px;
-overflow:hidden;
-display:flex;
-flex-direction:column;
-}
+    /* Controls */
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin:0 0 12px;
+    }
+    .select, .btn{
+      border:1px solid var(--line);
+      background:#0d0d0d;
+      color:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:900;
+      font-size:13px;
+    }
+    .select{outline:none}
+    .btn{cursor:pointer}
+    .btn:hover{border-color:#2b2b2b}
 
-.posterThumb{
-width:100%;
-aspect-ratio:19/6;
-background:#000;
-position:relative;
-overflow:hidden;
-flex:0 0 auto;
-}
+    /* Blocks */
+    .block{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      padding:12px;
+      margin-top:12px;
+      overflow:hidden;
+    }
+    .blockHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .muted{color:var(--muted); font-size:12px}
 
-.posterThumb img{
-width:100%;
-height:100%;
-object-fit:cover;
-object-position:center;
-}
+    /* ✅ POSTER TIKTOK 9:16 (3 kolom) */
+    .posterGrid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:10px;
+      align-items:start;
+    }
+    .posterCard{
+      background:#0b0b0b;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .posterThumb{
+      aspect-ratio:9/16;            /* ✅ tiktok ratio */
+      background:#000;
+      position:relative;
+      overflow:hidden;
+    }
+    .posterThumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+    }
+    .posterMeta{padding:10px 10px 12px}
+    .posterTitle{
+      font-weight:900;
+      font-size:13px;
+      line-height:1.2;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .posterSub{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
-.posterMeta{padding:10px}
-.posterTitle{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.posterSub{font-size:12px;color:var(--muted)}
+    /* 16:9 grid */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    @media (min-width:900px){
+      .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      overflow:hidden;
+    }
+    .thumb169{aspect-ratio:16/9;background:#000;position:relative; overflow:hidden}
+    .thumb169 img{width:100%;height:100%;object-fit:cover}
+    .meta{padding:10px 10px 12px}
+    .title{
+      font-weight:900;font-size:13px;line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
 
-/* 16:9 GRID */
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-@media(min-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.thumb169{aspect-ratio:16/9;background:#000;position:relative}
-.thumb169 img{width:100%;height:100%;object-fit:cover}
-.meta{padding:10px}
-.title{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sub{font-size:12px;color:var(--muted)}
+    /* Badges */
+    .badgeHD{
+      position:absolute; top:8px; left:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:900;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .badgeViews{
+      position:absolute; bottom:8px; right:8px;
+      padding:4px 8px; border-radius:999px;
+      font-size:12px; font-weight:800;
+      background:rgba(0,0,0,.65);
+      border:1px solid rgba(255,255,255,.12);
+      color:#e5e7eb;
+    }
 
-.badgeHD,.badgeViews{position:absolute;background:rgba(0,0,0,.65);border-radius:999px;padding:4px 8px;font-size:12px}
-.badgeHD{top:8px;left:8px}
-.badgeViews{bottom:8px;right:8px}
+    /* Pagination */
+    .pager{
+      display:flex; gap:8px; flex-wrap:wrap;
+      justify-content:center;
+      padding:16px 0 6px;
+    }
+    .pbtn{
+      min-width:38px;height:38px;
+      border-radius:12px;
+      background:#0d0d0d;
+      border:1px solid var(--line);
+      display:grid;place-items:center;
+      cursor:pointer;
+      font-size:13px;
+      padding:0 10px;
+      color:#fff;
+      font-weight:900;
+    }
+    .pbtn:hover{border-color:#2b2b2b}
+    .pbtn.on{background:#0b1220;border-color:#2b3a57;color:#fff}
+    .pbtn.dot{cursor:default; opacity:.7}
 
-.footer{border-top:1px solid var(--line);margin-top:14px;padding:14px;text-align:center;color:var(--muted);font-size:12px}
-.hide{display:none!important}
-</style>
+    .empty{
+      padding:14px;
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:16px;
+    }
+
+    .footer{
+      border-top:1px solid var(--line);
+      margin-top:14px;
+      padding:14px 12px 18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    .hide{display:none!important}
+  </style>
 </head>
 
 <body>
+  <header class="header">
+    <div class="bar">
+      <a class="left" href="/" aria-label="home">
+        <div class="logo">
+          <img alt="logo" loading="lazy"
+               src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
+        </div>
+        <div class="brand">videypro</div>
+      </a>
 
-<header class="header">
-<div class="bar">
-<a class="left" href="/">
-<div class="logo"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png"></div>
-<div class="brand">videypro</div>
-</a>
-</div>
-</header>
+      <div class="right">
+        <button class="iconbtn" id="btnSearch" aria-label="search">
+          <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+        </button>
+        <button class="iconbtn" id="btnMenu" aria-label="menu">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
 
-<main class="wrap">
+    <div class="searchWrap" id="searchWrap">
+      <div class="searchBox">
+        <input id="q" placeholder="Cari di genre ini..." autocomplete="off" />
+        <div class="searchHint" id="searchHint"></div>
+      </div>
+    </div>
+  </header>
 
-<div class="topRow">
-<div class="pageTitle" id="genreTitle">Genre</div>
-<button class="backBtn" onclick="history.back()">Back</button>
-</div>
+  <div class="drawerMask" id="drawerMask"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawerTop">
+      <div class="drawerTitle">Menu</div>
+      <button class="closebtn" id="btnClose" aria-label="close">
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round">
+          <path d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+    </div>
 
-<div class="controls">
-<select id="sortSel" class="select">
-<option value="popular">Sort: Populer</option>
-<option value="newest">Sort: Terbaru</option>
-</select>
-<button class="btn" onclick="location.reload()">Reset</button>
-</div>
+    <div class="navList" id="navStatic">
+      <a class="navItem" href="/">Home</a>
+      <a class="navItem" href="/">Latest Update</a>
+      <a class="navItem" href="/">New Update</a>
+      <a class="navItem" href="/">Jadwal Update</a>
+    </div>
 
-<section class="block hide" id="posterBlock">
-<div class="blockHead">
-<div>
-<h2>Poster (19:6)</h2>
-<div class="muted" id="posterCount"></div>
-</div>
-<button class="btn hide" id="btnPosterAll">Show All</button>
-</div>
-<div class="posterGrid" id="posterGrid"></div>
-</section>
+    <div class="navSection">Genre</div>
+    <div class="navList" id="navGenres"></div>
+  </aside>
 
-<section class="block" id="videoBlock">
-<div class="blockHead">
-<div>
-<h2>All Videos</h2>
-<div class="muted" id="videoCount"></div>
-</div>
-</div>
-<div class="grid" id="grid"></div>
-</section>
+  <main class="wrap">
+    <div class="topRow">
+      <div class="pageTitle" id="genreTitle">Genre</div>
+      <button class="backBtn" type="button" id="btnBack">Back</button>
+    </div>
 
-<footer class="footer">videypro</footer>
+    <div class="controls">
+      <select class="select" id="sortSel" aria-label="sorting">
+        <option value="popular">Sort: Populer</option>
+        <option value="newest">Sort: Terbaru</option>
+      </select>
+      <button class="btn" id="btnReset" type="button">Reset</button>
+    </div>
 
-</main>
+    <!-- ✅ Poster TikTok block (judulnya diilangin) -->
+    <section class="block hide" id="posterBlock">
+      <div class="blockHead">
+        <div class="muted" id="posterCount">0 item</div>
+        <button class="pbtn" id="btnPosterAll" type="button">Show All</button>
+      </div>
+      <div class="posterGrid" id="posterGrid"></div>
+    </section>
 
-<script>
-const $=id=>document.getElementById(id);
-const LOGO="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
+    <!-- 16:9 All Videos -->
+    <section class="block" id="videoBlock">
+      <div class="blockHead">
+        <div>
+          <div style="font-weight:900;font-size:14px;color:#e5e7eb;letter-spacing:.2px">All Videos</div>
+          <div class="muted" id="videoCount">0 item</div>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="pager" id="pager"></div>
+      <div class="empty hide" id="videoEmpty">Tidak ada video 16:9 di genre ini.</div>
+    </section>
 
-async function loadVideos(){
-const r=await fetch("/api/videos?t="+Date.now(),{cache:"no-store"});
-return await r.json();
-}
+    <footer class="footer">videypro</footer>
+  </main>
 
-function getGenre(){
-return new URL(location.href).searchParams.get("g")||"";
-}
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const esc = (s="") => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+    const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
 
-async function init(){
-const genre=getGenre();
-$("genreTitle").textContent="Genre: "+genre;
-const all=await loadVideos();
-const inGenre=all.filter(v=>(v.genre||"").toLowerCase().includes(genre.toLowerCase()));
+    const PAGE_SIZE = 20;
 
-const posters=inGenre.filter(v=>v.poster_wide_url);
-const videos=inGenre.filter(v=>!v.poster_wide_url);
+    let all = [];
+    let genreName = "";
+    let postersAll = [];
+    let videosAll = [];
+    let postersShownAll = false;
+    let currentPage = 1;
 
-if(posters.length){
-$("posterBlock").classList.remove("hide");
-$("posterCount").textContent=posters.length+" item";
-$("posterGrid").innerHTML=posters.slice(0,6).map(v=>`
-<a class="posterCard" href="/watch.html?id=${v.id}">
-<div class="posterThumb">
-<img src="${v.poster_wide_url||LOGO}">
-<div class="badgeHD">HD</div>
-<div class="badgeViews">${v.views||0} views</div>
-</div>
-<div class="posterMeta">
-<div class="posterTitle">${v.title}</div>
-<div class="posterSub">${v.genre}</div>
-</div>
-</a>`).join("");
-}
+    function fmtViews(n){
+      const x = Number(n || 0);
+      try { return x.toLocaleString("id-ID"); } catch { return String(x); }
+    }
 
-$("videoCount").textContent=videos.length+" item";
-$("grid").innerHTML=videos.map(v=>`
-<a class="card" href="/watch.html?id=${v.id}">
-<div class="thumb169">
-<img src="${v.thumbnail_url||LOGO}">
-<div class="badgeHD">HD</div>
-<div class="badgeViews">${v.views||0} views</div>
-</div>
-<div class="meta">
-<div class="title">${v.title}</div>
-<div class="sub">${v.genre}</div>
-</div>
-</a>`).join("");
-}
+    function getGenreParam(){
+      const u = new URL(location.href);
+      return (u.searchParams.get("g") || "").trim();
+    }
 
-init();
-</script>
+    async function loadVideos(){
+      const url = `/api/videos?t=${Date.now()}`;
+      const r = await fetch(url, { cache:"no-store" });
+      if (!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      return Array.isArray(data) ? data : [];
+    }
 
+    function toggleSearch(force){
+      const w = $("searchWrap");
+      const on = typeof force === "boolean" ? force : !w.classList.contains("on");
+      w.classList.toggle("on", on);
+      if (on) $("q").focus();
+      else {
+        $("q").value = "";
+        $("searchHint").textContent = "";
+        applyFilters();
+      }
+    }
+    function openDrawer(open){
+      const mask = $("drawerMask");
+      const d = $("drawer");
+      const on = typeof open === "boolean" ? open : !d.classList.contains("on");
+      mask.classList.toggle("on", on);
+      d.classList.toggle("on", on);
+      d.setAttribute("aria-hidden", on ? "false" : "true");
+    }
+
+    function renderGenres(){
+      const set = new Set();
+      all.forEach(v => {
+        const g = String(v.genre || "").split(",").map(x=>x.trim()).filter(Boolean);
+        if (!g.length) set.add("Lainnya");
+        g.forEach(x => set.add(x));
+      });
+      const genres = Array.from(set).sort((a,b)=>a.localeCompare(b));
+
+      const wrap = $("navGenres");
+      wrap.innerHTML = genres.map(g => `<div class="navItem" data-genre="${esc(g)}">${esc(g)}</div>`).join("");
+
+      wrap.querySelectorAll("[data-genre]").forEach(el => {
+        el.addEventListener("click", () => {
+          const g = el.getAttribute("data-genre") || "";
+          openDrawer(false);
+          location.href = `/genre.html?g=${encodeURIComponent(g)}`;
+        });
+      });
+    }
+
+    function sortItems(items, mode){
+      const arr = items.slice();
+      if (mode === "newest"){
+        arr.sort((a,b) => {
+          const da = Date.parse(a.created_at || a.date || "") || 0;
+          const db = Date.parse(b.created_at || b.date || "") || 0;
+          if (db !== da) return db - da;
+          return Number(b.id||0) - Number(a.id||0);
+        });
+      } else {
+        arr.sort((a,b) => Number(b.views||0) - Number(a.views||0));
+      }
+      return arr;
+    }
+
+    function matchGenre(v, gLower){
+      const genre = String(v.genre || "").toLowerCase();
+      const list = genre.split(",").map(x=>x.trim()).filter(Boolean);
+      if (!gLower) return true;
+      return list.includes(gLower);
+    }
+
+    function applyFilters(){
+      const q = $("q").value.trim().toLowerCase();
+      const sortMode = $("sortSel").value;
+      const gLower = genreName.toLowerCase();
+
+      const inGenre = all.filter(v => matchGenre(v, gLower));
+
+      let posters = inGenre.filter(v => v.poster_wide_url);  // ✅ poster tiktok (9:16) pakai poster_wide_url
+      let videos  = inGenre.filter(v => !v.poster_wide_url);
+
+      if (q){
+        posters = posters.filter(v =>
+          String(v.title||"").toLowerCase().includes(q) ||
+          String(v.genre||"").toLowerCase().includes(q)
+        );
+        videos = videos.filter(v =>
+          String(v.title||"").toLowerCase().includes(q) ||
+          String(v.genre||"").toLowerCase().includes(q)
+        );
+        $("searchHint").textContent = `${posters.length + videos.length} hasil`;
+      } else {
+        $("searchHint").textContent = "";
+      }
+
+      postersAll = sortItems(posters, sortMode);
+      videosAll  = sortItems(videos, sortMode);
+
+      currentPage = 1;
+      render();
+    }
+
+    function renderPosters(){
+      const grid = $("posterGrid");
+      const btn = $("btnPosterAll");
+
+      if (!postersAll.length){
+        $("posterBlock").classList.add("hide");   // ✅ hilang total kalau kosong
+        grid.innerHTML = "";
+        btn.classList.add("hide");
+        return;
+      }
+
+      $("posterBlock").classList.remove("hide");
+      $("posterCount").textContent = `${postersAll.length} item`;
+
+      const shown = postersShownAll ? postersAll : postersAll.slice(0, 6);
+
+      if (postersAll.length <= 6){
+        btn.classList.add("hide");
+      } else {
+        btn.classList.remove("hide");
+        btn.textContent = postersShownAll ? "Show Less" : "Show All";
+      }
+
+      grid.innerHTML = shown.map(v => {
+        const thumb = v.poster_wide_url || v.thumbnail_url || LOGO;
+        const viewsText = fmtViews(v.views);
+        return `
+          <a class="posterCard" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="posterThumb">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
+            </div>
+            <div class="posterMeta">
+              <div class="posterTitle">${esc(v.title || "Untitled")}</div>
+              <div class="posterSub">${esc(genreName)}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function setPage(p){
+      currentPage = p;
+      renderVideos();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function paginate(totalPages){
+      const pager = $("pager");
+      pager.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      const btn = (label, p, cls="") => {
+        const b = document.createElement("button");
+        b.className = `pbtn ${cls}`.trim();
+        b.textContent = label;
+        if (p) b.onclick = () => setPage(p);
+        return b;
+      };
+
+      const page = currentPage;
+      const pages = [1];
+      const start = Math.max(2, page - 2);
+      const end = Math.min(totalPages - 1, page + 2);
+
+      if (start > 2) pages.push("...");
+      for (let i=start;i<=end;i++) pages.push(i);
+      if (end < totalPages - 1) pages.push("...");
+      pages.push(totalPages);
+
+      const compact = [];
+      for (const x of pages){
+        if (compact.length && compact[compact.length-1] === x) continue;
+        compact.push(x);
+      }
+
+      compact.forEach(x => {
+        if (x === "...") pager.appendChild(btn("…", null, "dot"));
+        else pager.appendChild(btn(String(x), x, (x===page ? "on" : "")));
+      });
+    }
+
+    function renderVideos(){
+      const grid = $("grid");
+      const empty = $("videoEmpty");
+
+      $("videoCount").textContent = `${videosAll.length} item`;
+
+      if (!videosAll.length){
+        grid.innerHTML = "";
+        $("pager").innerHTML = "";
+        empty.classList.remove("hide");
+        return;
+      }
+      empty.classList.add("hide");
+
+      const totalPages = Math.max(1, Math.ceil(videosAll.length / PAGE_SIZE));
+      currentPage = Math.min(currentPage, totalPages);
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = videosAll.slice(start, start + PAGE_SIZE);
+
+      grid.innerHTML = pageItems.map(v => {
+        const thumb = v.thumbnail_url || LOGO;
+        const viewsText = fmtViews(v.views);
+        return `
+          <a class="card" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="thumb169">
+              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+              <div class="badgeHD">HD</div>
+              <div class="badgeViews">${viewsText} views</div>
+            </div>
+            <div class="meta">
+              <div class="title">${esc(v.title || "Untitled")}</div>
+              <div class="sub">${esc(genreName)}</div>
+            </div>
+          </a>
+        `;
+      }).join("");
+
+      paginate(totalPages);
+    }
+
+    function render(){
+      $("genreTitle").textContent = genreName ? `Genre: ${genreName}` : "Genre";
+      renderPosters();
+      renderVideos();
+    }
+
+    async function init(){
+      $("btnSearch").addEventListener("click", ()=>toggleSearch());
+      $("btnMenu").addEventListener("click", ()=>openDrawer(true));
+      $("btnClose").addEventListener("click", ()=>openDrawer(false));
+      $("drawerMask").addEventListener("click", ()=>openDrawer(false));
+
+      $("btnBack").onclick = () => {
+        if (document.referrer && new URL(document.referrer).origin === location.origin) history.back();
+        else location.href = "/";
+      };
+
+      $("q").addEventListener("input", debounce(applyFilters, 120));
+      $("sortSel").addEventListener("change", applyFilters);
+      $("btnReset").onclick = () => {
+        $("q").value = "";
+        $("sortSel").value = "popular";
+        postersShownAll = false;
+        applyFilters();
+      };
+
+      $("btnPosterAll").onclick = () => {
+        if ($("btnPosterAll").classList.contains("hide")) return;
+        postersShownAll = !postersShownAll;
+        renderPosters();
+        $("posterBlock").scrollIntoView({ behavior:"smooth", block:"start" });
+      };
+
+      genreName = getGenreParam();
+
+      all = await loadVideos();
+      if (Array.isArray(all) && all.length > 0 && all.length <= 3) {
+        await new Promise(r => setTimeout(r, 450));
+        const again = await loadVideos();
+        if (Array.isArray(again) && again.length > all.length) all = again;
+      }
+
+      renderGenres();
+
+      if (!genreName) {
+        const g = (all.find(v => String(v.genre||"").trim())?.genre || "").split(",")[0]?.trim();
+        if (g) {
+          genreName = g;
+          const u = new URL(location.href);
+          u.searchParams.set("g", g);
+          history.replaceState(null, "", u.toString());
+        }
+      }
+
+      applyFilters();
+    }
+
+    init().catch(e => {
+      document.querySelector("main.wrap").innerHTML = `<div class="wrap"><div class="empty">Error: ${esc(e.message || e)}</div></div>`;
+    });
+  </script>
 </body>
 </html>
