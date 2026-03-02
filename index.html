@@ -132,7 +132,7 @@
       color:#e5e7eb; font-weight:800;
     }
 
-    /* Carousel (popular + poster tiktok) */
+    /* Carousel (popular) */
     .carousel{
       position:relative;
       background:transparent;
@@ -147,22 +147,14 @@
     .track::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
     .citem{
       flex:0 0 auto;
-      width:220px; /* kecilin popular + umum */
+      width:220px; /* kecilin popular */
       scroll-snap-align:start;
       background:var(--card);
       border:1px solid var(--line);
       border-radius:var(--r);
       overflow:hidden;
     }
-
-    /* FIX: poster tiktok lebih kecil lagi */
-    .citem.tiktok{ width:120px; }
-
     .thumb169{aspect-ratio:16/9;background:#000;height:auto}
-    /* thumb196 dipakai poster tiktok 9:16 */
-    .thumb196{aspect-ratio:9/16;background:#000;height:auto}
-    .thumb196 img{width:100%;height:100%;object-fit:cover}
-
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
     .ctitle{
@@ -185,94 +177,8 @@
     .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
     .carBtn:hover{border-color:#2b2b2b}
 
-    /* ====== TAMBAHAN: SECTION MODEL NEKOPOI (HORIZONTAL PER GENRE) ====== */
-    .sec{
-      margin-top:14px;
-    }
-    .secHead{
-      display:flex; align-items:center; justify-content:space-between;
-      margin:10px 0 10px;
-      gap:12px;
-    }
-    .secHead .h{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
-      color:#e5e7eb;
-      font-weight:800;
-    }
-    .secHead .more{
-      font-size:13px;
-      color:#f5a5c6;
-      opacity:.95;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .secHead .more:hover{opacity:1}
-
-    .row{
-      display:flex;
-      gap:10px;
-      overflow:auto;
-      scroll-snap-type:x mandatory;
-      padding-bottom:6px;
-      -webkit-overflow-scrolling:touch;
-    }
-    .row::-webkit-scrollbar{height:8px}
-    .row::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
-
-    .miniCard{
-      flex:0 0 auto;
-      width:170px;               /* ukuran card kecil */
-      scroll-snap-align:start;
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:14px;
-      overflow:hidden;
-    }
-    .miniThumb{aspect-ratio:16/9;background:#000}
-    .miniThumb img{width:100%;height:100%;object-fit:cover}
-    .miniMeta{padding:8px 10px 10px}
-    .miniTitle{
-      font-weight:800;
-      font-size:12px;
-      line-height:1.2;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
-      overflow:hidden;
-      min-height:30px;
-    }
-    /* ====== END TAMBAHAN ====== */
-
-    /* Grid videos 2 kolom (JANGAN jadi 1 kolom) */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:12px;
-      margin-top:10px;
-    }
-    @media (min-width:900px){
-      .grid{grid-template-columns:repeat(3, minmax(0, 1fr))}
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      overflow:hidden;
-    }
-    .card .thumb{aspect-ratio:16/9;background:#000}
-    .card .thumb img{width:100%;height:100%;object-fit:cover}
-    .meta{padding:10px 10px 12px}
-    .title{
-      font-weight:800;font-size:13px;line-height:1.2;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .sub{margin-top:6px;font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
-
-    /* Badges */
-    .thumb, .thumb169, .thumb196{position:relative; overflow:hidden}
+    /* Badges (dipake juga di nekopoi row) */
+    .thumb169{position:relative; overflow:hidden}
     .badgeHD{
       position:absolute; top:8px; left:8px;
       padding:4px 8px; border-radius:999px;
@@ -289,26 +195,84 @@
       color:#e5e7eb;
     }
 
-    /* Pagination */
-    .pager{
-      display:flex; gap:8px; flex-wrap:wrap;
-      justify-content:center;
-      padding:16px 0 6px;
+    /* ====== NEKOPOI STYLE SECTIONS ====== */
+    .secBlock{
+      margin-top:14px;
+      padding:12px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
     }
-    .pbtn{
-      min-width:38px;height:38px;
-      border-radius:12px;
-      background:#0d0d0d;
-      border:1px solid var(--line);
-      display:grid;place-items:center;
+    .secHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .secTitle{
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .secMore{
+      color:#f0a3d2;
+      font-weight:900;
+      font-size:14px;
+      opacity:.95;
       cursor:pointer;
-      font-size:13px;
-      padding:0 10px;
-      color:#fff;
+      background:transparent;
+      border:0;
+      padding:6px 8px;
     }
-    .pbtn:hover{border-color:#2b2b2b}
-    .pbtn.on{background:#0b1220;border-color:#2b3a57;color:#fff}
-    .pbtn.dot{cursor:default; opacity:.7}
+    .secMore:active{transform:scale(.98)}
+    .htrack{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:6px;
+      scroll-snap-type:x mandatory;
+    }
+    .htrack::-webkit-scrollbar{height:8px}
+    .htrack::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
+    .hitem{
+      flex:0 0 auto;
+      width:170px;
+      scroll-snap-align:start;
+    }
+    .hcard{
+      border-radius:16px;
+      overflow:hidden;
+      background:#121212;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .hthumb{
+      aspect-ratio:16/9;
+      background:#000;
+      position:relative;
+      overflow:hidden;
+    }
+    .hthumb img{width:100%;height:100%;object-fit:cover}
+    .hmeta{
+      padding:10px 10px 12px;
+    }
+    .htitle{
+      font-weight:900;
+      font-size:13px;
+      line-height:1.2;
+      color:#e5e7eb;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      min-height:32px;
+    }
+    .hsub{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
     /* Footer */
     .footer{
@@ -381,7 +345,7 @@
   <!-- Content -->
   <main class="wrap">
 
-    <!-- Popular -->
+    <!-- Popular (tetap) -->
     <section id="popularSection" class="hide">
       <div class="sectionTitle">
         <h2>Popular Post</h2>
@@ -399,37 +363,8 @@
       </div>
     </section>
 
-    <!-- Poster (tiktok 9:16) - cuma di bawah popular -->
-    <section id="wideSection" class="hide" style="margin-top:14px">
-      <div class="sectionTitle">
-        <h2>Poster</h2>
-        <button id="seeAllPoster" class="pbtn" type="button">See All</button>
-      </div>
-      <div class="carousel">
-        <div class="track" id="wideTrack"></div>
-        <div class="carBtns">
-          <button class="carBtn" id="widePrev" aria-label="prev">
-            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <button class="carBtn" id="wideNext" aria-label="next">
-            <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ====== TAMBAHAN: SECTION KATEGORI HORIZONTAL (ALA NEKOPOI) ====== -->
-    <section id="sectionsWrap"></section>
-    <!-- ====== END TAMBAHAN ====== -->
-
-    <!-- Grid -->
-    <section style="margin-top:14px">
-      <div class="sectionTitle">
-        <h2 id="listTitle">All Videos</h2>
-      </div>
-      <div class="grid" id="grid"></div>
-      <div class="pager" id="pager"></div>
-    </section>
+    <!-- Nekopoi-style sections render di sini -->
+    <div id="nekopoiSections"></div>
 
     <footer class="footer">videypro</footer>
   </main>
@@ -441,20 +376,15 @@
     const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
 
     // ---------- Config ----------
-    const PAGE_SIZE = 20;         // max 20 per halaman (grid 16:9)
-    const INSERT_WIDE_EVERY = 6;  // sela 6 video
     const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
 
     // ---------- State ----------
     let all = [];
     let filtered = [];
-    let currentPage = 1;
     let currentGenre = ""; // filter dari drawer
-    let showAllPoster = false; // tombol See All poster
 
     // ---------- API ----------
     async function loadVideos(){
-      // bust cache + edge stale
       const url = `/api/videos?t=${Date.now()}`;
       const r = await fetch(url, { cache: "no-store" });
       if (!r.ok) throw new Error(await r.text());
@@ -486,7 +416,7 @@
       d.setAttribute("aria-hidden", on ? "false" : "true");
     }
 
-    // ---------- Carousels ----------
+    // ---------- Carousels (popular) ----------
     function scrollByCard(track, dir=1){
       const card = track.querySelector(".citem");
       const w = card ? (card.getBoundingClientRect().width + 10) : 220;
@@ -498,16 +428,13 @@
       try { return x.toLocaleString("id-ID"); } catch { return String(x); }
     }
 
-    function renderCarousel(trackEl, items, kind){
-      // kind: "popular" (16:9) or "wide" (poster tiktok 9:16)
+    function renderCarousel(trackEl, items){
       trackEl.innerHTML = items.map(v => {
-        const isTikTok = (kind === "wide");
-        const thumb = isTikTok ? (v.poster_wide_url || v.thumbnail_url || LOGO) : (v.thumbnail_url || LOGO);
-        const ratioClass = isTikTok ? "thumb196" : "thumb169";
+        const thumb = (v.thumbnail_url || LOGO);
         const viewsText = fmtViews(v.views);
         return `
-          <a class="citem ${isTikTok ? "tiktok" : ""}" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
-            <div class="${ratioClass}">
+          <a class="citem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+            <div class="thumb169">
               <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
               <div class="badgeHD">HD</div>
               <div class="badgeViews">${viewsText} views</div>
@@ -521,148 +448,96 @@
       }).join("");
     }
 
-    // ---------- Grid + Poster insertion ----------
-    function buildGridItems(pageItems, posters){
-      const chunks = [];
-      let pIndex = 0;
-
-      for (let i=0; i<pageItems.length; i++){
-        chunks.push({ type:"video", v: pageItems[i] });
-
-        const at = i + 1;
-        const shouldInsert = (at % INSERT_WIDE_EVERY === 0);
-        if (shouldInsert && posters.length){
-          const slice = posters.slice(pIndex, pIndex + 10);
-          if (slice.length){
-            chunks.push({ type:"wideStrip", posters: slice });
-            pIndex += slice.length;
-            if (pIndex >= posters.length) pIndex = 0;
-          }
-        }
-      }
-      return chunks;
+    // ---------- Nekopoi sections ----------
+    function splitGenres(items){
+      // parse genre CSV, taro ke map {genre: [videos]}
+      const map = new Map();
+      items.forEach(v => {
+        const raw = String(v.genre || "").trim();
+        const genres = raw ? raw.split(",").map(x=>x.trim()).filter(Boolean) : ["Lainnya"];
+        genres.forEach(g => {
+          if (!map.has(g)) map.set(g, []);
+          map.get(g).push(v);
+        });
+      });
+      return map;
     }
 
-    function renderWideStrip(posters, idx){
-      const id = `wstrip_${idx}`;
-      const prevId = `wprev_${idx}`;
-      const nextId = `wnext_${idx}`;
-      return `
-        <div class="card" style="grid-column:1/-1;padding:10px">
-          <div class="carousel">
-            <div class="track" id="${id}">
-              ${posters.map(v => {
+    function renderSectionsLikeNekopoi(items){
+      const host = $("nekopoiSections");
+      if (!host) return;
+
+      // kalo user pilih genre via drawer, kita fokus 1 genre itu
+      const byGenre = currentGenre.trim();
+      const map = splitGenres(items);
+
+      let entries = Array.from(map.entries());
+
+      // urut: yang paling banyak dulu (biar mirip app)
+      entries.sort((a,b) => b[1].length - a[1].length);
+
+      if (byGenre){
+        entries = entries.filter(([g]) => g.toLowerCase() === byGenre.toLowerCase());
+        if (!entries.length){
+          // fallback kalau genre gak ketemu
+          entries = Array.from(map.entries()).sort((a,b) => b[1].length - a[1].length).slice(0, 1);
+        }
+      } else {
+        // tampilkan beberapa section aja biar enak (kalo mau semua tinggal hapus slice)
+        entries = entries.slice(0, 8);
+      }
+
+      host.innerHTML = entries.map(([g, arr], idx) => {
+        // ambil 12 item per section (selengkapnya buat filter genre)
+        const show = arr
+          .slice()
+          .sort((a,b)=> Number(b.views||0) - Number(a.views||0))
+          .slice(0, 12);
+
+        const rowId = `htrack_${idx}`;
+
+        return `
+          <section class="secBlock">
+            <div class="secHead">
+              <div class="secTitle">${esc(g)}</div>
+              <button class="secMore" type="button" data-more="${esc(g)}">selengkapnya...</button>
+            </div>
+
+            <div class="htrack" id="${rowId}">
+              ${show.map(v => {
+                const thumb = v.thumbnail_url || LOGO;
                 const viewsText = fmtViews(v.views);
                 return `
-                <a class="citem tiktok" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
-                  <div class="thumb196">
-                    <img loading="lazy" src="${esc(v.poster_wide_url || v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
-                    <div class="badgeHD">HD</div>
-                    <div class="badgeViews">${viewsText} views</div>
-                  </div>
-                  <div class="cmeta">
-                    <div class="ctitle">${esc(v.title || "Untitled")}</div>
-                    <div class="csub">${esc(v.genre || "")}</div>
-                  </div>
-                </a>
+                  <a class="hitem" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
+                    <div class="hcard">
+                      <div class="hthumb">
+                        <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
+                        <div class="badgeHD">HD</div>
+                        <div class="badgeViews">${viewsText} views</div>
+                      </div>
+                      <div class="hmeta">
+                        <div class="htitle">${esc(v.title || "Untitled")}</div>
+                        <div class="hsub">${esc(v.genre || "")}</div>
+                      </div>
+                    </div>
+                  </a>
                 `;
               }).join("")}
             </div>
-            <div class="carBtns">
-              <button class="carBtn" id="${prevId}" aria-label="prev">
-                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-              </button>
-              <button class="carBtn" id="${nextId}" aria-label="next">
-                <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderGrid(chunks){
-      const grid = $("grid");
-      let stripCount = 0;
-
-      grid.innerHTML = chunks.map(item => {
-        if (item.type === "wideStrip"){
-          const html = renderWideStrip(item.posters, stripCount);
-          stripCount++;
-          return html;
-        }
-        const v = item.v;
-        const thumb = v.thumbnail_url || LOGO;
-        const viewsText = fmtViews(v.views);
-        return `
-          <a class="card" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
-            <div class="thumb">
-              <img loading="lazy" src="${esc(thumb)}" alt="${esc(v.title)}" />
-              <div class="badgeHD">HD</div>
-              <div class="badgeViews">${viewsText} views</div>
-            </div>
-            <div class="meta">
-              <div class="title">${esc(v.title || "Untitled")}</div>
-              <div class="sub">
-                ${v.genre ? `<span>${esc(v.genre)}</span>` : ``}
-              </div>
-            </div>
-          </a>
+          </section>
         `;
       }).join("");
 
-      for (let i=0;i<stripCount;i++){
-        const t = $(`wstrip_${i}`);
-        const p = $(`wprev_${i}`);
-        const n = $(`wnext_${i}`);
-        if (t && p && n){
-          p.onclick = () => scrollByCard(t, -1);
-          n.onclick = () => scrollByCard(t, 1);
-        }
-      }
-    }
-
-    // ---------- Pagination ----------
-    function setPage(p){
-      currentPage = p;
-      renderList();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function paginate(totalPages){
-      const pager = $("pager");
-      pager.innerHTML = "";
-      if (totalPages <= 1) return;
-
-      const btn = (label, p, cls="") => {
-        const b = document.createElement("button");
-        b.className = `pbtn ${cls}`.trim();
-        b.textContent = label;
-        if (p) b.onclick = () => setPage(p);
-        return b;
-      };
-
-      const page = currentPage;
-      const pages = [];
-
-      pages.push(1);
-      const start = Math.max(2, page - 2);
-      const end = Math.min(totalPages - 1, page + 2);
-
-      if (start > 2) pages.push("...");
-      for (let i=start;i<=end;i++) pages.push(i);
-      if (end < totalPages - 1) pages.push("...");
-      if (totalPages > 1) pages.push(totalPages);
-
-      const compact = [];
-      for (const x of pages){
-        if (compact.length && compact[compact.length-1] === x) continue;
-        compact.push(x);
-      }
-
-      compact.forEach(x => {
-        if (x === "...") pager.appendChild(btn("…", null, "dot"));
-        else pager.appendChild(btn(String(x), x, (x===page ? "on" : "")));
+      // bind "selengkapnya..." -> filter genre itu
+      host.querySelectorAll("[data-more]").forEach(btn => {
+        btn.onclick = () => {
+          const g = btn.getAttribute("data-more") || "";
+          currentGenre = g;
+          // close drawer kalo kebuka
+          openDrawer(false);
+          applyFilters();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
       });
     }
 
@@ -674,95 +549,23 @@
       filtered = all.filter(v => {
         const title = String(v.title || "").toLowerCase();
         const genre = String(v.genre || "").toLowerCase();
-
         const matchQ = !q || title.includes(q) || genre.includes(q);
-        const matchG = !byGenre || genre.split(",").map(x=>x.trim()).includes(byGenre);
+
+        // genre filter: cocok exact dari daftar CSV
+        const gList = genre.split(",").map(x=>x.trim()).filter(Boolean);
+        const matchG = !byGenre || gList.includes(byGenre);
+
         return matchQ && matchG;
       });
 
-      currentPage = 1;
-      renderList();
-
       $("searchHint").textContent = q ? `${filtered.length} hasil` : "";
-      $("listTitle").textContent = byGenre ? `Genre: ${currentGenre}` : "All Videos";
+
+      renderList();
     }
 
-    // ====== TAMBAHAN: render section kategori horizontal ala NekoPoi ======
-    function pickFirstGenre(g){
-      return String(g||"").split(",").map(x=>x.trim()).filter(Boolean)[0] || "Lainnya";
-    }
-
-    function renderSectionsLikeNekopoi(items){
-      const wrap = $("sectionsWrap");
-      if (!wrap) return;
-
-      // pakai video non-poster biar rapi (thumbnail 16:9)
-      const source = items.slice();
-
-      const map = new Map();
-      source.forEach(v=>{
-        const key = pickFirstGenre(v.genre);
-        if (!map.has(key)) map.set(key, []);
-        map.get(key).push(v);
-      });
-
-      const groups = Array.from(map.entries())
-        .map(([k, arr]) => [k, arr.sort((a,b)=>Number(b.views||0)-Number(a.views||0))])
-        .sort((a,b)=>b[1].length - a[1].length);
-
-      const MAX_SECTION = 6;
-      const PER_SECTION = 10;
-
-      const top = groups
-        .filter(([name, arr]) => arr.length >= 3) // biar gak section kosong2
-        .slice(0, MAX_SECTION);
-
-      if (!top.length){
-        wrap.innerHTML = "";
-        return;
-      }
-
-      wrap.innerHTML = top.map(([name, arr]) => {
-        const list = arr.slice(0, PER_SECTION);
-        return `
-          <section class="sec">
-            <div class="secHead">
-              <h3 class="h">${esc(name)}</h3>
-              <span class="more" data-more-genre="${esc(name)}">selengkapnya...</span>
-            </div>
-            <div class="row">
-              ${list.map(v => `
-                <a class="miniCard" href="/watch.html?id=${encodeURIComponent(v.id)}" title="${esc(v.title)}">
-                  <div class="miniThumb">
-                    <img loading="lazy" src="${esc(v.thumbnail_url || LOGO)}" alt="${esc(v.title)}" />
-                  </div>
-                  <div class="miniMeta">
-                    <div class="miniTitle">${esc(v.title || "Untitled")}</div>
-                  </div>
-                </a>
-              `).join("")}
-            </div>
-          </section>
-        `;
-      }).join("");
-
-      // klik selengkapnya -> set genre filter
-      wrap.querySelectorAll("[data-more-genre]").forEach(el=>{
-        el.onclick = () => {
-          const g = el.getAttribute("data-more-genre") || "";
-          currentGenre = g;
-          applyFilters();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        };
-      });
-    }
-    // ====== END TAMBAHAN ======
-
-    // ---------- Render list ----------
+    // ---------- Render list (Popular + Nekopoi sections) ----------
     function renderList(){
-      // poster (tiktok) TIDAK masuk All Videos
-      const posters = filtered.filter(v => v.poster_wide_url);
-      const normal  = filtered.filter(v => !v.poster_wide_url);
+      const normal = filtered.filter(v => !v.poster_wide_url);
 
       // Popular: TOP views dari normal
       const popular = [...normal]
@@ -771,38 +574,13 @@
 
       if (popular.length && Number(popular[0]?.views || 0) > 0){
         $("popularSection").classList.remove("hide");
-        renderCarousel($("popularTrack"), popular, "popular");
+        renderCarousel($("popularTrack"), popular);
       } else {
         $("popularSection").classList.add("hide");
       }
 
-      // Poster section: ada tombol See All
-      if (posters.length){
-        $("wideSection").classList.remove("hide");
-        // kalau See All ON -> tampilkan semua poster, kalau OFF -> tampilkan 20 pertama
-        renderCarousel($("wideTrack"), showAllPoster ? posters : posters.slice(0, 20), "wide");
-        const btn = $("seeAllPoster");
-        if (btn) btn.textContent = showAllPoster ? "Show Less" : "See All";
-      } else {
-        $("wideSection").classList.add("hide");
-      }
-
-      // ====== TAMBAHAN: section kategori horizontal (di bawah poster) ======
-      // pakai "normal" biar thumbnail 16:9 konsisten kayak contoh
+      // Nekopoi sections
       renderSectionsLikeNekopoi(normal);
-      // ====== END TAMBAHAN ======
-
-      const totalPages = Math.max(1, Math.ceil(normal.length / PAGE_SIZE));
-      const page = Math.min(currentPage, totalPages);
-      currentPage = page;
-
-      const start = (page - 1) * PAGE_SIZE;
-      const pageItems = normal.slice(start, start + PAGE_SIZE);
-
-      const chunks = buildGridItems(pageItems, posters);
-      renderGrid(chunks);
-
-      paginate(totalPages);
     }
 
     // ---------- Drawer genre list ----------
@@ -810,6 +588,7 @@
       const set = new Set();
       all.forEach(v => {
         const g = String(v.genre || "").split(",").map(x=>x.trim()).filter(Boolean);
+        if (!g.length) set.add("Lainnya");
         g.forEach(x => set.add(x));
       });
       const genres = Array.from(set).sort((a,b)=>a.localeCompare(b));
@@ -843,17 +622,6 @@
 
       $("popularPrev").onclick = ()=>scrollByCard($("popularTrack"), -1);
       $("popularNext").onclick = ()=>scrollByCard($("popularTrack"), 1);
-      $("widePrev").onclick = ()=>scrollByCard($("wideTrack"), -1);
-      $("wideNext").onclick = ()=>scrollByCard($("wideTrack"), 1);
-
-      // See All poster toggle
-      const seeAllBtn = $("seeAllPoster");
-      if (seeAllBtn){
-        seeAllBtn.onclick = () => {
-          showAllPoster = !showAllPoster;
-          renderList();
-        };
-      }
 
       $("q").addEventListener("input", debounce(applyFilters, 120));
 
@@ -872,8 +640,8 @@
         renderGenres();
         renderList();
       }catch(e){
-        $("grid").innerHTML = `<div class="card" style="padding:14px">Error: ${esc(e.message || e)}</div>`;
-        $("pager").innerHTML = "";
+        const host = $("nekopoiSections");
+        if (host) host.innerHTML = `<div class="secBlock">Error: ${esc(e.message || e)}</div>`;
       }
     }
 
