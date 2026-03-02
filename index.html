@@ -1,12 +1,11 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta name="6a97888e-site-verification" content="bf5503829d6fa2359609d79d67892233">
+  <meta name="6a97888e-site-verification" content="bf5503829d6fa2359609d6fa2359609d79d67892233">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>videypro</title>
 
-  <!-- favicon pake logo -->
   <link rel="icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png" />
 
   <style>
@@ -69,36 +68,23 @@
     .iconbtn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 
     /* Search dropdown (toggle) */
-    .searchWrap{
-      max-width:var(--max); margin:0 auto;
-      padding:0 12px 10px;
-      display:none;
-    }
+    .searchWrap{max-width:var(--max); margin:0 auto; padding:0 12px 10px; display:none}
     .searchWrap.on{display:block}
     .searchBox{
       display:flex; gap:10px; align-items:center;
       background:#0d0d0d; border:1px solid var(--line);
       border-radius:14px; padding:10px 12px;
     }
-    .searchBox input{
-      flex:1; border:0; outline:0;
-      background:transparent; color:#fff;
-      font-size:14px;
-    }
+    .searchBox input{flex:1; border:0; outline:0; background:transparent; color:#fff; font-size:14px}
     .searchHint{color:var(--muted); font-size:12px}
 
     /* Drawer */
-    .drawerMask{
-      position:fixed; inset:0; z-index:60;
-      background:rgba(0,0,0,.55);
-      display:none;
-    }
+    .drawerMask{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.55); display:none}
     .drawerMask.on{display:block}
     .drawer{
       position:fixed; top:0; right:-320px; height:100%; width:320px; z-index:61;
       background:#0d0d0d; border-left:1px solid var(--line);
-      transition:right .2s ease;
-      padding:14px;
+      transition:right .2s ease; padding:14px;
     }
     .drawer.on{right:0}
     .drawerTop{display:flex; align-items:center; justify-content:space-between; gap:10px}
@@ -110,57 +96,39 @@
     }
     .navList{margin-top:12px; display:flex; flex-direction:column; gap:8px}
     .navItem{
-      padding:10px 12px;
-      border-radius:12px;
-      background:#0b0b0b;
-      border:1px solid var(--line);
-      cursor:pointer;
-      font-size:14px;
+      padding:10px 12px; border-radius:12px; background:#0b0b0b;
+      border:1px solid var(--line); cursor:pointer; font-size:14px;
     }
     .navItem:hover{border-color:#2b2b2b}
     .navSection{margin-top:10px; color:var(--muted); font-size:12px}
 
     /* Layout */
     .wrap{max-width:var(--max); margin:0 auto; padding:14px 12px 0}
-    .sectionTitle{
-      display:flex; align-items:center; justify-content:space-between;
-      margin:10px 0 10px;
-      gap:10px;
-    }
-    .sectionTitle h2{
-      margin:0; font-size:14px; letter-spacing:.2px;
-      color:#e5e7eb; font-weight:800;
-    }
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; margin:10px 0 10px; gap:10px}
+    .sectionTitle h2{margin:0; font-size:14px; letter-spacing:.2px; color:#e5e7eb; font-weight:800}
 
-    /* Carousel (popular) */
-    .carousel{
-      position:relative;
-      background:transparent;
-    }
+    /* Popular carousel */
+    .carousel{position:relative; background:transparent}
     .track{
       display:flex; gap:10px;
       overflow:auto; scroll-snap-type:x mandatory;
-      padding-bottom:6px;
-      -webkit-overflow-scrolling:touch;
+      padding-bottom:6px; -webkit-overflow-scrolling:touch;
     }
     .track::-webkit-scrollbar{height:8px}
     .track::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
     .citem{
       flex:0 0 auto;
-      width:220px; /* kecilin popular */
+      width:220px;
       scroll-snap-align:start;
       background:var(--card);
       border:1px solid var(--line);
       border-radius:var(--r);
       overflow:hidden;
     }
-    .thumb169{aspect-ratio:16/9;background:#000;height:auto}
+    .thumb169{aspect-ratio:16/9;background:#000;height:auto; position:relative; overflow:hidden}
     .citem img{width:100%;height:100%;object-fit:cover}
     .cmeta{padding:10px 10px 12px}
-    .ctitle{
-      font-weight:800; font-size:13px; line-height:1.2;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .ctitle{font-weight:800; font-size:13px; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .csub{margin-top:6px; font-size:12px; color:var(--muted)}
     .carBtns{
       position:absolute; inset:0; pointer-events:none;
@@ -177,8 +145,7 @@
     .carBtn svg{width:18px;height:18px;stroke:#fff;stroke-width:2;fill:none;opacity:.9}
     .carBtn:hover{border-color:#2b2b2b}
 
-    /* Badges (dipake juga di nekopoi row) */
-    .thumb169{position:relative; overflow:hidden}
+    /* Badges */
     .badgeHD{
       position:absolute; top:8px; left:8px;
       padding:4px 8px; border-radius:999px;
@@ -195,7 +162,7 @@
       color:#e5e7eb;
     }
 
-    /* ====== NEKOPOI STYLE SECTIONS ====== */
+    /* Nekopoi-style sections */
     .secBlock{
       margin-top:14px;
       padding:12px;
@@ -203,15 +170,8 @@
       background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border:1px solid rgba(255,255,255,.08);
     }
-    .secHead{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
-    }
-    .secTitle{
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:.2px;
-    }
+    .secHead{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+    .secTitle{font-size:16px; font-weight:900; letter-spacing:.2px}
     .secMore{
       color:#f0a3d2;
       font-weight:900;
@@ -222,59 +182,34 @@
       border:0;
       padding:6px 8px;
     }
-    .secMore:active{transform:scale(.98)}
     .htrack{
-      display:flex;
-      gap:10px;
-      overflow:auto;
-      -webkit-overflow-scrolling:touch;
-      padding-bottom:6px;
-      scroll-snap-type:x mandatory;
+      display:flex; gap:10px;
+      overflow:auto; -webkit-overflow-scrolling:touch;
+      padding-bottom:6px; scroll-snap-type:x mandatory;
     }
     .htrack::-webkit-scrollbar{height:8px}
     .htrack::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:999px}
-    .hitem{
-      flex:0 0 auto;
-      width:170px;
-      scroll-snap-align:start;
-    }
-    .hcard{
-      border-radius:16px;
-      overflow:hidden;
-      background:#121212;
-      border:1px solid rgba(255,255,255,.08);
-    }
-    .hthumb{
-      aspect-ratio:16/9;
-      background:#000;
-      position:relative;
-      overflow:hidden;
-    }
+    .hitem{flex:0 0 auto; width:170px; scroll-snap-align:start}
+    .hcard{border-radius:16px; overflow:hidden; background:#121212; border:1px solid rgba(255,255,255,.08)}
+    .hthumb{aspect-ratio:16/9; background:#000; position:relative; overflow:hidden}
     .hthumb img{width:100%;height:100%;object-fit:cover}
-    .hmeta{
-      padding:10px 10px 12px;
-    }
+    .hmeta{padding:10px 10px 12px}
     .htitle{
-      font-weight:900;
-      font-size:13px;
-      line-height:1.2;
-      color:#e5e7eb;
-      overflow:hidden;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
+      font-weight:900; font-size:13px; line-height:1.2; color:#e5e7eb;
+      overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
       min-height:32px;
     }
-    .hsub{
-      margin-top:6px;
-      font-size:12px;
+    .hsub{margin-top:6px; font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+    /* Loading */
+    .loading{
+      padding:14px;
       color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:16px;
+      margin-top:14px;
     }
 
-    /* Footer */
     .footer{
       border-top:1px solid var(--line);
       margin-top:14px;
@@ -283,14 +218,11 @@
       font-size:12px;
       text-align:center;
     }
-
-    /* Utility */
     .hide{display:none!important}
   </style>
 </head>
 
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="bar">
       <div class="left">
@@ -311,7 +243,6 @@
       </div>
     </div>
 
-    <!-- Search (toggle) -->
     <div class="searchWrap" id="searchWrap">
       <div class="searchBox">
         <input id="q" placeholder="Cari judul / genre..." autocomplete="off" />
@@ -320,7 +251,6 @@
     </div>
   </header>
 
-  <!-- Drawer -->
   <div class="drawerMask" id="drawerMask"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawerTop">
@@ -342,7 +272,6 @@
     <div class="navList" id="navGenres"></div>
   </aside>
 
-  <!-- Content -->
   <main class="wrap">
 
     <!-- Popular (tetap) -->
@@ -363,27 +292,23 @@
       </div>
     </section>
 
-    <!-- Nekopoi-style sections render di sini -->
-    <div id="nekopoiSections"></div>
+    <div id="nekopoiSections">
+      <div class="loading">Loading konten...</div>
+    </div>
 
     <footer class="footer">videypro</footer>
   </main>
 
   <script>
-    // ---------- Utils ----------
     const $ = (id) => document.getElementById(id);
     const esc = (s="") => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const debounce = (fn, ms=150) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
-
-    // ---------- Config ----------
     const LOGO = "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6s1XWqZEsV1lM6IpO7DtDtvK_FrWPhd40Bl858JxP5qFVvh2TPNyCNuShcMQWOsuV0WHv7S14C2WYPumF6WZOgc2D59hRAdnMIeGuSKKxZtlyujnakGnVLREf9Lwm8G2I0IYKXUY4aYtJ88qWJVXDw-ffYtvoPjtQxqYmEZqY0VL9IafS0a7mw6jke6wE/s1154/104427.png";
 
-    // ---------- State ----------
     let all = [];
     let filtered = [];
-    let currentGenre = ""; // filter dari drawer
+    let currentGenre = "";
 
-    // ---------- API ----------
     async function loadVideos(){
       const url = `/api/videos?t=${Date.now()}`;
       const r = await fetch(url, { cache: "no-store" });
@@ -392,21 +317,18 @@
       return Array.isArray(data) ? data : [];
     }
 
-    // ---------- Header controls ----------
     function toggleSearch(force){
       const w = $("searchWrap");
       const on = typeof force === "boolean" ? force : !w.classList.contains("on");
       w.classList.toggle("on", on);
-      if (on) {
-        $("q").focus();
-      } else {
+      if (on) $("q").focus();
+      else {
         $("q").value = "";
         $("searchHint").textContent = "";
         currentGenre = "";
         applyFilters();
       }
     }
-
     function openDrawer(open){
       const mask = $("drawerMask");
       const d = $("drawer");
@@ -416,7 +338,6 @@
       d.setAttribute("aria-hidden", on ? "false" : "true");
     }
 
-    // ---------- Carousels (popular) ----------
     function scrollByCard(track, dir=1){
       const card = track.querySelector(".citem");
       const w = card ? (card.getBoundingClientRect().width + 10) : 220;
@@ -428,7 +349,7 @@
       try { return x.toLocaleString("id-ID"); } catch { return String(x); }
     }
 
-    function renderCarousel(trackEl, items){
+    function renderPopular(trackEl, items){
       trackEl.innerHTML = items.map(v => {
         const thumb = (v.thumbnail_url || LOGO);
         const viewsText = fmtViews(v.views);
@@ -448,9 +369,7 @@
       }).join("");
     }
 
-    // ---------- Nekopoi sections ----------
     function splitGenres(items){
-      // parse genre CSV, taro ke map {genre: [videos]}
       const map = new Map();
       items.forEach(v => {
         const raw = String(v.genre || "").trim();
@@ -467,43 +386,29 @@
       const host = $("nekopoiSections");
       if (!host) return;
 
-      // kalo user pilih genre via drawer, kita fokus 1 genre itu
-      const byGenre = currentGenre.trim();
       const map = splitGenres(items);
+      let entries = Array.from(map.entries()).sort((a,b)=> b[1].length - a[1].length);
 
-      let entries = Array.from(map.entries());
-
-      // urut: yang paling banyak dulu (biar mirip app)
-      entries.sort((a,b) => b[1].length - a[1].length);
-
-      if (byGenre){
-        entries = entries.filter(([g]) => g.toLowerCase() === byGenre.toLowerCase());
-        if (!entries.length){
-          // fallback kalau genre gak ketemu
-          entries = Array.from(map.entries()).sort((a,b) => b[1].length - a[1].length).slice(0, 1);
-        }
+      if (currentGenre.trim()){
+        entries = entries.filter(([g]) => g.toLowerCase() === currentGenre.toLowerCase());
       } else {
-        // tampilkan beberapa section aja biar enak (kalo mau semua tinggal hapus slice)
         entries = entries.slice(0, 8);
       }
 
+      if (!entries.length){
+        host.innerHTML = `<div class="secBlock">Tidak ada konten.</div>`;
+        return;
+      }
+
       host.innerHTML = entries.map(([g, arr], idx) => {
-        // ambil 12 item per section (selengkapnya buat filter genre)
-        const show = arr
-          .slice()
-          .sort((a,b)=> Number(b.views||0) - Number(a.views||0))
-          .slice(0, 12);
-
-        const rowId = `htrack_${idx}`;
-
+        const show = arr.slice().sort((a,b)=> Number(b.views||0) - Number(a.views||0)).slice(0, 12);
         return `
           <section class="secBlock">
             <div class="secHead">
               <div class="secTitle">${esc(g)}</div>
               <button class="secMore" type="button" data-more="${esc(g)}">selengkapnya...</button>
             </div>
-
-            <div class="htrack" id="${rowId}">
+            <div class="htrack">
               ${show.map(v => {
                 const thumb = v.thumbnail_url || LOGO;
                 const viewsText = fmtViews(v.views);
@@ -528,20 +433,15 @@
         `;
       }).join("");
 
-      // bind "selengkapnya..." -> filter genre itu
       host.querySelectorAll("[data-more]").forEach(btn => {
         btn.onclick = () => {
           const g = btn.getAttribute("data-more") || "";
-          currentGenre = g;
-          // close drawer kalo kebuka
-          openDrawer(false);
-          applyFilters();
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          // pindah halaman genre
+          location.href = `/genre.html?g=${encodeURIComponent(g)}`;
         };
       });
     }
 
-    // ---------- Filters (search + genre) ----------
     function applyFilters(){
       const q = $("q").value.trim().toLowerCase();
       const byGenre = currentGenre.trim().toLowerCase();
@@ -551,7 +451,6 @@
         const genre = String(v.genre || "").toLowerCase();
         const matchQ = !q || title.includes(q) || genre.includes(q);
 
-        // genre filter: cocok exact dari daftar CSV
         const gList = genre.split(",").map(x=>x.trim()).filter(Boolean);
         const matchG = !byGenre || gList.includes(byGenre);
 
@@ -563,27 +462,23 @@
       renderList();
     }
 
-    // ---------- Render list (Popular + Nekopoi sections) ----------
     function renderList(){
       const normal = filtered.filter(v => !v.poster_wide_url);
 
-      // Popular: TOP views dari normal
       const popular = [...normal]
         .sort((a,b) => (Number(b.views||0) - Number(a.views||0)))
         .slice(0, 20);
 
       if (popular.length && Number(popular[0]?.views || 0) > 0){
         $("popularSection").classList.remove("hide");
-        renderCarousel($("popularTrack"), popular);
+        renderPopular($("popularTrack"), popular);
       } else {
         $("popularSection").classList.add("hide");
       }
 
-      // Nekopoi sections
       renderSectionsLikeNekopoi(normal);
     }
 
-    // ---------- Drawer genre list ----------
     function renderGenres(){
       const set = new Set();
       all.forEach(v => {
@@ -592,15 +487,14 @@
         g.forEach(x => set.add(x));
       });
       const genres = Array.from(set).sort((a,b)=>a.localeCompare(b));
-
       const wrap = $("navGenres");
       wrap.innerHTML = genres.map(g => `<div class="navItem" data-genre="${esc(g)}">${esc(g)}</div>`).join("");
 
       wrap.querySelectorAll("[data-genre]").forEach(el => {
         el.addEventListener("click", () => {
-          currentGenre = el.getAttribute("data-genre") || "";
+          const g = el.getAttribute("data-genre") || "";
           openDrawer(false);
-          applyFilters();
+          location.href = `/genre.html?g=${encodeURIComponent(g)}`;
         });
       });
 
@@ -613,23 +507,19 @@
       });
     }
 
-    // ---------- Init ----------
     async function init(){
       $("btnSearch").addEventListener("click", ()=>toggleSearch());
       $("btnMenu").addEventListener("click", ()=>openDrawer(true));
       $("btnClose").addEventListener("click", ()=>openDrawer(false));
       $("drawerMask").addEventListener("click", ()=>openDrawer(false));
-
       $("popularPrev").onclick = ()=>scrollByCard($("popularTrack"), -1);
       $("popularNext").onclick = ()=>scrollByCard($("popularTrack"), 1);
-
       $("q").addEventListener("input", debounce(applyFilters, 120));
 
       try{
         all = await loadVideos();
 
-        // FIX: kalau baru masuk dan cuma kebaca dikit (misal 3),
-        // retry 1x setelah jeda kecil (edge/cold start/cache aneh)
+        // retry 1x kalo ke-load cuma sedikit
         if (Array.isArray(all) && all.length > 0 && all.length <= 3) {
           await new Promise(r => setTimeout(r, 450));
           const again = await loadVideos();
@@ -640,8 +530,7 @@
         renderGenres();
         renderList();
       }catch(e){
-        const host = $("nekopoiSections");
-        if (host) host.innerHTML = `<div class="secBlock">Error: ${esc(e.message || e)}</div>`;
+        $("nekopoiSections").innerHTML = `<div class="secBlock">Error: ${esc(e.message || e)}</div>`;
       }
     }
 
