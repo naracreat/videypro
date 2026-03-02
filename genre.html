@@ -177,13 +177,22 @@
       border-radius:14px;
       overflow:hidden;
     }
+
+    /* ✅ FIX: 19:6 tetep 19:6 tapi gak super tipis + crop rapi */
     .posterThumb{
-      aspect-ratio:19/6; /* PAKAI 19:6 BENERAN */
+      aspect-ratio:19/6;
       background:#000;
       position:relative;
       overflow:hidden;
+      min-height:64px; /* bikin banner gak terlalu tipis di HP */
     }
-    .posterThumb img{width:100%;height:100%;object-fit:cover}
+    .posterThumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+    }
+
     .posterMeta{padding:10px 10px 12px}
     .posterTitle{
       font-weight:900;
@@ -518,21 +527,29 @@
 
       $("posterCount").textContent = `${postersAll.length} item`;
 
+      /* ✅ FIX 1: kalau poster kosong, section poster ILANG total */
       if (!postersAll.length){
+        $("posterBlock").classList.add("hide");
+        // tetap rapihin isi biar gak nyisa
         grid.innerHTML = "";
-        empty.classList.remove("hide");
+        empty.classList.add("hide");
         btn.classList.add("hide");
         return;
+      } else {
+        $("posterBlock").classList.remove("hide");
       }
 
       empty.classList.add("hide");
-      btn.classList.remove("hide");
 
       const shown = postersShownAll ? postersAll : postersAll.slice(0, 6); // max 6 dulu
 
-      btn.textContent = postersShownAll ? "Show Less" : "Show All";
-      btn.disabled = postersAll.length <= 6 ? true : false;
-      btn.style.opacity = postersAll.length <= 6 ? ".6" : "1";
+      /* ✅ FIX 2: tombol show all cuma muncul kalau > 6 */
+      if (postersAll.length <= 6){
+        btn.classList.add("hide");
+      } else {
+        btn.classList.remove("hide");
+        btn.textContent = postersShownAll ? "Show Less" : "Show All";
+      }
 
       grid.innerHTML = shown.map(v => {
         const thumb = v.poster_wide_url || v.thumbnail_url || LOGO;
@@ -676,6 +693,8 @@
 
       // poster show all
       $("btnPosterAll").onclick = () => {
+        // kalau tombol lagi hidden, aman aja
+        if ($("btnPosterAll").classList.contains("hide")) return;
         postersShownAll = !postersShownAll;
         renderPosters();
         // tetep stay di area poster
@@ -719,4 +738,4 @@
     });
   </script>
 </body>
-        </html>
+</html>
