@@ -36,17 +36,14 @@
     .status{white-space:pre-wrap;color:#9ca3af;font-size:13px}
     .ok{color:#86efac}.bad{color:#fca5a5}
     .historyTop{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-    table{width:100%;border-collapse:separate;border-spacing:0 8px}
     td,th{font-size:13px;text-align:left}
     th{color:#9ca3af;font-weight:700}
-    .tr{background:#0f0f0f;border:1px solid #1f1f1f}
     .rowcard{border:1px solid #1f1f1f;background:#0f0f0f;border-radius:14px;padding:10px}
     .twrap{display:grid;grid-template-columns:1.2fr .7fr .6fr;gap:10px;align-items:center}
     @media (max-width:860px){.twrap{grid-template-columns:1fr}}
     .small{font-size:12px;color:#9ca3af}
     .idpill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #2a2a2a;background:#0c0c0c;font-size:12px;color:#cbd5e1}
-    /* ✨ tambahan kecil biar datalist keliatan enak */
-    datalist{background:#0c0c0c;color:#fff}
+    .hide{display:none!important}
   </style>
 </head>
 <body>
@@ -80,12 +77,16 @@
             <label>Title</label>
             <input id="title" placeholder="Judul" />
           </div>
+
+          <!-- ✅ GENRE: dropdown + custom -->
           <div>
             <label>Genre</label>
-            <!-- ✅ autocomplete genre via datalist -->
-            <input id="genre" placeholder="action, drama" list="genreList" />
-            <datalist id="genreList"></datalist>
-            <div class="small" style="margin-top:6px">Tip: klik kolom genre buat pilih genre yang pernah dipakai.</div>
+            <select id="genre_sel"></select>
+            <div style="height:8px"></div>
+            <input id="genre_custom" class="hide" placeholder="ketik genre (contoh: action, drama)" />
+            <div class="small" style="margin-top:6px">
+              Pilih genre yang sudah ada, atau pilih <b>Custom</b> kalau mau nambah genre baru.
+            </div>
           </div>
         </div>
 
@@ -188,7 +189,7 @@
     try{ localStorage.setItem(LS_PASS, p || ""); }catch{}
   }
 
-  // ✅ genre persist + datalist
+  // ✅ genre persist + select
   function parseGenresCSV(csv){
     return String(csv||"")
       .split(",")
@@ -207,29 +208,91 @@
   function saveGenres(genres){
     try{ localStorage.setItem(LS_GENRES, JSON.stringify(genres)); }catch{}
   }
+  function mergeGenres(fromHistory=[]){
+    const map = new Map(); // lower -> original
+    loadSavedGenres().forEach(g => map.set(String(g).toLowerCase(), g));
+    fromHistory.forEach(g => {
+      const key = String(g).toLowerCase();
+      if (!map.has(key)) map.set(key, g);
+    });
+    return Array.from(map.values()).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+  }
+
+  // render genre select
+  function renderGenreSelect(genres){
+    const sel = $("genre_sel");
+    const current = sel.value || "";
+
+    const options = [];
+    options.push({ v:"", label:"— Pilih Genre —" });
+    for (const g of genres) options.push({ v:g, label:g });
+    options.push({ v:"__custom__", label:"Custom (ketik manual)" });
+
+    sel.innerHTML = options.map(o => `<option value="${esc(o.v)}">${esc(o.label)}</option>`).join("");
+
+    // restore selection if possible
+    if (current && options.some(o => o.v === current)) sel.value = current;
+    else sel.value = options.length > 2 ? options[1].v : ""; // default ke genre pertama kalau ada
+    syncGenreMode();
+  }
+
+  function syncGenreMode(){
+    const selVal = $("genre_sel").value;
+    const custom = $("genre_custom");
+    if (selVal === "__custom__"){
+      custom.classList.remove("hide");
+      custom.focus();
+    } else {
+      custom.classList.add("hide");
+    }
+  }
+
   function addGenresFromValue(val){
     const incoming = parseGenresCSV(val);
     if (!incoming.length) return;
 
-    const current = new Set(loadSavedGenres().map(x => x.toLowerCase()));
-    const out = loadSavedGenres().slice();
-
-    for (const g of incoming){
-      const key = g.toLowerCase();
-      if (!current.has(key)){
-        current.add(key);
-        out.push(g);
-      }
-    }
-    // sort A-Z biar rapi
-    out.sort((a,b)=>a.localeCompare(b));
-    saveGenres(out);
-    renderGenreDatalist(out);
+    const merged = mergeGenres(incoming);
+    saveGenres(merged);
+    renderGenreSelect(merged);
   }
-  function renderGenreDatalist(list){
-    const dl = $("genreList");
-    const genres = (list && list.length) ? list : loadSavedGenres();
-    dl.innerHTML = genres.map(g => `<option value="${esc(g)}"></option>`).join("");
+
+  function getGenreValue(){
+    const selVal = $("genre_sel").value;
+    if (selVal === "__custom__"){
+      return $("genre_custom").value.trim();
+    }
+    return selVal.trim();
+  }
+
+  function setGenreValueForEdit(csv){
+    const val = String(csv||"").trim();
+    if (!val){
+      $("genre_sel").value = "";
+      $("genre_custom").value = "";
+      syncGenreMode();
+      return;
+    }
+
+    // coba match exact ke option
+    const opts = Array.from($("genre_sel").options).map(o => o.value);
+    if (opts.includes(val)){
+      $("genre_sel").value = val;
+      $("genre_custom").value = "";
+      syncGenreMode();
+      return;
+    }
+
+    // kalau ga ada, masukin ke saved + pilih itu
+    addGenresFromValue(val);
+    // setelah render ulang, coba pilih lagi
+    if (Array.from($("genre_sel").options).some(o => o.value === val)){
+      $("genre_sel").value = val;
+      $("genre_custom").value = "";
+    } else {
+      $("genre_sel").value = "__custom__";
+      $("genre_custom").value = val;
+    }
+    syncGenreMode();
   }
 
   function renderServers(){
@@ -289,7 +352,7 @@
       password: $("password").value,
       id: $("edit_id").value ? Number($("edit_id").value) : undefined,
       title: $("title").value.trim(),
-      genre: $("genre").value.trim(),
+      genre: getGenreValue(),
       thumbnail_url: $("thumbnail_url").value.trim(),
       poster_wide_url: $("poster_wide_url").value.trim(),
     };
@@ -309,6 +372,8 @@
   function validate(payload){
     if (!payload.password) return "Password kosong";
     if (!payload.title) return "Title kosong";
+    // genre opsional sesuai versi awal (kalau mau wajib, tinggal aktifin ini)
+    // if (!payload.genre) return "Genre belum dipilih";
 
     let hasServer = false;
     for (let i=1;i<=SERVER_COUNT;i++){
@@ -368,13 +433,18 @@
     $("mode").value = "create";
     $("edit_id").value = "";
     $("title").value = "";
-    $("genre").value = "";
     $("thumbnail_url").value = "";
     $("poster_wide_url").value = "";
     for (let i=1;i<=SERVER_COUNT;i++){
       $(`server${i}_type`).value = "";
       $(`server${i}_url`).value = "";
     }
+
+    // reset genre to first (if any), and hide custom
+    const genres = loadSavedGenres();
+    renderGenreSelect(genres);
+    $("genre_custom").value = "";
+
     setStatus("");
   }
 
@@ -382,7 +452,7 @@
     $("mode").value = "edit";
     $("edit_id").value = v.id;
     $("title").value = v.title || "";
-    $("genre").value = v.genre || "";
+    setGenreValueForEdit(v.genre || "");
     $("thumbnail_url").value = v.thumbnail_url || "";
     $("poster_wide_url").value = v.poster_wide_url || "";
     for (let i=1;i<=SERVER_COUNT;i++){
@@ -447,21 +517,12 @@
     setStatus("Loading history...", true);
     HISTORY = await apiList();
 
-    // ✅ update genre suggestions from history (sekalian gabung sama localStorage)
-    const seen = new Map(); // lower -> original
-    for (const g of loadSavedGenres()) seen.set(String(g).toLowerCase(), g);
-
-    HISTORY.forEach(v=>{
-      const gs = parseGenresCSV(v.genre);
-      gs.forEach(x=>{
-        const key = x.toLowerCase();
-        if (!seen.has(key)) seen.set(key, x);
-      });
-    });
-
-    const merged = Array.from(seen.values()).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+    // update genre list from history + local storage
+    const fromHistory = [];
+    HISTORY.forEach(v => parseGenresCSV(v.genre).forEach(g => fromHistory.push(g)));
+    const merged = mergeGenres(fromHistory);
     saveGenres(merged);
-    renderGenreDatalist(merged);
+    renderGenreSelect(merged);
 
     renderHistory(HISTORY);
     setStatus("", true);
@@ -508,11 +569,11 @@
       const mode = $("mode").value;
       setStatus("Saving...", true);
 
-      // ✅ save password every successful attempt (biar ke-save terus)
+      // save password always
       savePassword($("password").value);
 
-      // ✅ save genres from input (biar genre berikutnya muncul)
-      addGenresFromValue($("genre").value);
+      // save genre if exists (also supports "a, b")
+      if (payload.genre) addGenresFromValue(payload.genre);
 
       if (mode === "edit") {
         if (!payload.id) return setStatus("Pilih item dari history dulu (Edit)", false);
@@ -532,10 +593,11 @@
   // init
   renderServers();
 
-  // ✅ load saved password + genres on boot
+  // boot saved states
   loadSavedPassword();
-  renderGenreDatalist(loadSavedGenres());
+  renderGenreSelect(loadSavedGenres());
 
+  // bind ui
   $("btnReset").onclick = resetForm;
   $("btnSubmit").onclick = submit;
   $("btnReload").onclick = () => reloadHistory().catch(e => setStatus(e.message||String(e), false));
@@ -555,23 +617,25 @@
     }
   });
 
-  // ✅ auto-save password when user types (debounced)
+  // password autosave while typing
   const savePassDebounced = debounce(() => savePassword($("password").value), 200);
   $("password").addEventListener("input", savePassDebounced);
 
-  // load history kalau password udah ada (biar langsung ke-load tanpa change)
+  // genre select behavior
+  $("genre_sel").addEventListener("change", syncGenreMode);
+
+  // if custom genre typed, save to list when user finishes typing
+  $("genre_custom").addEventListener("blur", () => {
+    const v = $("genre_custom").value.trim();
+    if (v) addGenresFromValue(v);
+  });
+
+  // load history immediately if password exists
   if (($("password").value || "").trim()){
     reloadHistory().catch(()=>{});
   } else {
-    // fallback behavior lama
     $("password").addEventListener("change", () => reloadHistory().catch(()=>{}));
   }
-
-  // ✅ update genre suggestions when user finishes typing genre (blur / enter)
-  $("genre").addEventListener("blur", () => addGenresFromValue($("genre").value));
-  $("genre").addEventListener("keydown", (e)=>{
-    if (e.key === "Enter") addGenresFromValue($("genre").value);
-  });
 </script>
 </body>
 </html>
